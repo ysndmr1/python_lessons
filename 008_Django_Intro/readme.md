@@ -49,6 +49,10 @@ $ ------installation Django------
 
 # pip freeze ile djnagonun env icinde kurulu olup olmadigini anlayabiliriz
 
+# pip freeze > requirements.txt ile dosya icindeki modulleri dosya icinde gösteriyor
+
+# pip install -r requirements.txt ile requirements dosyasini gönderdigimiz kisi bu sekilde acip kullanabilir
+
 # django-admin --version
 
 # django-admin startproject projectName -- temel ayarlarimizin bulundugu klasör
