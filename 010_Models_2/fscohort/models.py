@@ -22,10 +22,21 @@ class Student(models.Model):
         ordering = ["-first_name"] # Ters sıralam için (DESC) sutun isminin başına - konur.
 
 #------------------ Django Shelll------------
+
+AGES = (
+    (10, 'Age:10'),
+    (20, 'Age:20'),
+    (30, 'Age:30'),
+    (40, 'Age:40'),
+    (50, 'Age:50'),
+    (60, 'Age:60'),
+)
+
+
 class Customer(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    age = models.PositiveIntegerField(default=0, blank=True, null=True)
+    age = models.PositiveIntegerField(default=0, blank=True, null=True,choices=AGES)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} - {self.age}'
