@@ -20,4 +20,4 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
 class CustomCursorPagination(CursorPagination):
     page_size = 25
     ordering = 'id'
-    # cursor_query_param = 'imlec'
+    cursor_query_param = 'imlec'
