@@ -127,7 +127,10 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# API Global Settings:
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 25
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', # Sayfa_No ile sayfalama
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', # Adet_Başlangıç ile sayfalama.
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.CursorPagination', #  Kursor ile sayfalama.  (modelde "created" isimli field bekler)
+    # 'PAGE_SIZE': 50
 }
