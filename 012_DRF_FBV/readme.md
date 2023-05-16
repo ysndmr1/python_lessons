@@ -67,9 +67,105 @@
 - tabiki model sayfasindan student modelini import ediyoruz
 - ⁡⁢⁣⁢aldigimiz model bir obje(queryset) bunu bir serializerden gecirecegiz serializer i tanimliyoruz ve app klasörumuz icinde kendi olusturdugumuz serializer.py dosyasi icinde olusturdugumuz converter imizi import ediyoruz ve tanimladigimiz serializer in karsinia yaziyoruz ⁡⁢⁣⁣ve bir önceki basamaktaki tanimladigimiz student object sini serializer icine yaziyoruz ve many i true yapiyoruz bu da birden fazla veri icerdigi anlamina geliyor⁡
 - ⁡⁢⁣⁢bu satirda yazdigimiz code obje halindeki stundet i yazdigimiz Studentserilazerden gecirerek serializer degiskenine ata
-- ⁡⁢⁣⁣ve atadigimiz bu veriyi Response ile ekrana yazdir diyoruz ⁡⁣⁢⁣fakat burada response u yazarken buraya kadar yazdigimiz verileri data icine attigi icin onuda response icinde serializer.data seklinde yaziyoruz⁡
+- ⁡⁢⁣⁣ve atadigimiz bu veriyi Response ile ekrana yazdir diyoruz ⁡⁣⁢⁣fakat burada response u yazarken buraya kadar yazdigimiz verileri data icine attigi icin onuda response icinde serializer.data seklinde yaziyoruz
+  ⁡
   ⁡⁢⁢⁢@api_view(['GET']) # Default: ['GET']
   def student_list(request):
   students = Student.objects.all()
   serializer = StudentSerializer(instance=students, many=True) # print(dir(serializer)) # print(serializer.data)
   return Response(serializer.data)⁡
+
+- student_list olarak yazdigimiz bu fonk url sayfasinda cagiriyoruz ve views.py sayfasindan yapacagimiz importlari tuple veri olarak da yazabiliyoruz urlpatterns icinde de fonk lari cagiriyoruz
+
+⁡⁢⁢⁢from .views import (
+home,
+student_list,
+student_create,
+student_detail,
+student_update,
+student_delete,
+student_list_create,
+student_detail_update_delete,
+)
+
+urlpatterns = [
+path('', home),
+path('student_list/', student_list),
+path('student_create/', student_create),
+path('student_detail/<int:pk>', student_detail),
+path('student_update/<int:pk>', student_update),
+path('student_delete/<int:pk>', student_delete),
+path('student_list_create/', student_list_create),
+path('student_detail_update_delete/<int:pk>', student_detail_update_delete),
+]⁡
+
+- ⁡⁢⁣⁢kayit olusturma islemi post ile yapiliyor kayit islemleri post ile guncelleme islemleri put ile yapiliyor
+
+- create islemi ile bir veri olusturdugumuzda bunu yazdigimiz create fonk nuna gönderiyoruz gönderdigimiz bu verileri request ile aliyoruz api sayfasinda olusturulan veri bize gelirken request ile geliyor, serializer olusturarak basliyoruz ve requestden gelen datayi serializer a ceviriyoruz bir önce ki islemde objeyi json a cevirmistik burada json u objeye cevirecegiz
+- eger gelen veri dogru ise bu veriyi kaydet basamagini yaziyoruz ve dogru oldugu durum icin bir status mesaji yaziyoruz ve status u de kullanmak icin rest_frmwrkden import ediyoruz
+- ardindan else ile datanin false olma durumunu yaziyoruz
+
+⁡⁢⁢⁢@api_view(['POST'])
+def student_create(request):
+serializer = StudentSerializer(data=request.data)
+if serializer.is_valid():
+serializer.save()
+return Response({
+"message": "Created Successfully"
+}, status=status.HTTP_201_CREATED)
+else:
+return Response({
+"message": "Data not validated",
+"data": serializer.data
+}, status=status.HTTP_400_BAD_REQUEST)⁡
+
+---- istedigimiz tek bir kayidi get,post,put islemleri yapma----
+
+- tek bir kayidi kullanacagimiz zaman id ye göre yapiyoruz ve urlsini yazarken sonuna id kismini ekliyoruz views de yazdigimiz fonk url sayfasinda hem import ediyoruz hem de url seklinde yaziyoruz
+- guvenlik gerektirmeten islemleri get ile yapiyorduk bu fonk da get ile yaziyoruz ve request yanina pk parametresi de ekliyoruz tek bir veri cekecegimiz icin
+- modelden cektigimiz veriyi bir degiskene atiyoruz ve get islemini id=pk e göre yapiyoruz
+- olmayan bir id cagirdigimizda hata verecek ve bu hatayi duzenlemek icin , hata safyasi gelmesin fakat veri olmadigini belirtmesi icin get_object_or_404(Student, id=pk) seklinde yaziyoruz ve bu kullandigimiz
+- aldigimiz ogje yi de okuyabilmek icin serializer ile json a ceviriyoruz ve fonk nu django short cut dan import ediyoruz
+  ⁡⁢⁢⁢@api_view(['GET'])
+  def student_detail(request, pk): # student = Student.objects.get(id=pk)
+  student = get_object_or_404(Student, id=pk)
+  serializer = StudentSerializer(instance=student)
+  return Response(serializer.data)⁡
+
+--- Tek bir veriyi guncelleme
+
+- guncelleme icinde ayni sekilde pk ye ihtiyacimiz var ayni sekilde yaziyiruz ve bu islemi put islemi ile yaptigimizi belirtiyoruz
+- önce gelen veriyi alacagimiz bir degisken yaziyoruz
+- sonraki basamakta aldigimiz veriyi serializerden geciriyoruz fakat burada degistirecegimiz data verisini de ekliyoruz disardan gelen veri bize request ile geliyor , data=request.data
+- sonra data dogru ise kaydet bilgisini döndur eger bilgi false ise ona göre message yayinla satirlarini yaziyoruz
+  -views de yazdigimiz fonk urls.py sayfasinda import edip kullaniyoruz
+  ⁡⁢⁢⁢@api_view(['PUT'])
+  def student_update(request, pk):
+  student = get_object_or_404(Student, id=pk)
+  serializer = StudentSerializer(instance=student, data=request.data)
+  if serializer.is_valid():
+  serializer.save()
+  return Response({
+  "message": "Created Successfully"
+  }, status=status.HTTP_202_ACCEPTED)
+  else:
+  return Response({
+  "message": "Data not validated",
+  "data": serializer.data
+  }, status=status.HTTP_400_BAD_REQUEST)
+
+⁡
+--- tek veriyi silme ---
+
+- silme islemini yine pk sini aldigimiz veriye göre yapacagiz ve islemimizin adi delete
+- öncelikle silecegimiz veriyi aliyoruz
+- sonra veriyi sil diyoruz
+- islem icin bir message yaziyoruz
+
+⁡⁢⁢⁢@api_view(['DELETE'])
+def student_delete(request, pk):
+student = get_object_or_404(Student, id=pk)
+student.delete()
+return Response({
+"message": "Deleted Successfully"
+}, status=status.HTTP_204_NO_CONTENT)⁡
