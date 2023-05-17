@@ -169,3 +169,33 @@ student.delete()
 return Response({
 "message": "Deleted Successfully"
 }, status=status.HTTP_204_NO_CONTENT)⁡
+
+----- Benzer fonksiyonlari birlestirme-----
+----- Id gerektirmeyenler-------
+-----kayit listeleme + yeni kayit -----
+
+- benzer fonksiyonlari tek bir fonk altinda birlestiriyoruz, gelen request metoduna göre condition ekliyoruruz
+- eger method get ise butun modeli getir bir serializerdan gecir ve bir response döndur diyoruz
+- else yazmamizin sebebi baslanginca 2 method gelebilir diye belirttik eger get degilse post dur seklinde olacak fakat elif de yazilabilir
+- post yapilirken bu sefer json olarak veri postlaniyor bunu serializerdan geciriyoruz ve gecerli ise kayit edip response dönduruyoruz
+- son olarak da verilerin dogru bir sekilde gelmedigi durumu ekleyip hata kodunu ve message yaziyoruz
+- views sayfasinda yaptigimiz degisiklikleri urls sayfasina import edip ekliyoruz
+
+⁡⁢⁢⁢@api_view(['GET', 'POST'])
+def student_list_create(request):
+if request.method == 'GET':
+students = Student.objects.all()
+serializer = StudentSerializer(students, many=True)
+return Response(serializer.data)
+else:
+serializer = StudentSerializer(data=request.data)
+if serializer.is_valid():
+serializer.save()
+return Response({
+"message": "Created Successfully"
+}, status=status.HTTP_201_CREATED)
+else:
+return Response({
+"message": "Data not validated",
+"data": serializer.data
+}, status=status.HTTP_400_BAD_REQUEST)⁡
