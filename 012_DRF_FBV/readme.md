@@ -199,3 +199,47 @@ return Response({
 "message": "Data not validated",
 "data": serializer.data
 }, status=status.HTTP_400_BAD_REQUEST)⁡
+
+--- id gerektirenler---
+--- kayit göruntuleme, guncelleme,silme----
+
+- yapacagimiz izlemleri api_view icinde tanimliyoruz
+- islemleri yapacagimiz fonk adini veriyoruz
+- yapacagimiz gelen metoda coklu if yapisi gibi olan match yapisini kullaniyoruz
+- get yapacagimiz icin get de kullanacagimiz yapiyi aliyoruz gelen request seializer modelimizden geciriyoruz ve response dönduruyoruz
+- sonra guncelleme metodumuz olan put icin yapiyoruz, request ile elimizde olan datayi serilzerdan geciriyoruz, data gecerli mi , gecerli ise kaydet ve degilse seklinde message lari ekliyoruz
+- son olarak delete fonk nunu ekliyoruz
+- hepsinde ortak olan student = get_object_or_404(Student, id=pk) satirini (modelden gelen verinin atama yapildigi satir) en uste ekliyoruz
+- views e ekledigimiz fonk lari urls sayfasinda import edip kullaniyoruz
+
+⁡⁢⁢⁢@api_view(['GET', 'PUT', 'DELETE'])
+def student_detail_update_delete(request, pk):
+
+    student = get_object_or_404(Student, id=pk)
+
+    match request.method:
+        case 'GET':
+            # Tek kayıt görüntüle:
+            serializer = StudentSerializer(instance=student)
+            return Response(serializer.data)
+
+        case 'PUT':
+            # Tek kayıt güncelle:
+            serializer = StudentSerializer(instance=student, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    "message": "Updated Successfully"
+                }, status=status.HTTP_202_ACCEPTED)
+            else:
+                return Response({
+                    "message": "Data not validated",
+                    "data": serializer.data
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        case 'DELETE':
+            # Tek kayıt sil:
+            student.delete()
+            return Response({
+                "message": "Deleted Successfully"
+            }, status=status.HTTP_204_NO_CONTENT)⁡
