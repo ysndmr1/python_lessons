@@ -4,24 +4,23 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
 
-class RegistrationsSerializer(serializers.ModelSerializer):
+class RegistrationSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
-
     )
 
     password = serializers.CharField(
         write_only=True,
         required=True,
-        validators=[validate_password]
+        validators=[validate_password],
+        # widgets = {forms.HiddenInput()}
     )
 
     password2 = serializers.CharField(
         write_only=True,
         required=True,
-
     )
 
     class Meta:
@@ -31,7 +30,7 @@ class RegistrationsSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError(
-                {'password': 'Password fields not matching'})
+                {'password': 'Password fields not matching!'})
         return attrs
 
     def create(self, validated_data):
@@ -39,7 +38,6 @@ class RegistrationsSerializer(serializers.ModelSerializer):
             username=validated_data.get('username'),
             email=validated_data.get('email'),
         )
-
         user.set_password(validated_data.get('password'))
         user.save()
 
