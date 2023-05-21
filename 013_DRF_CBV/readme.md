@@ -184,7 +184,15 @@ path('student_list_create/', StudentListCreate.as_view()),
 - mixin i import ettikten sonra yazdigimiz generic classinin icinde kullanacagimiz mixinleri inherit ediyoruz ve sonuna altyapi olarak gerekli onak genericapi i da ekliyoruz
 - queryset olarak olusturdugumuz model objesinin hepsini veriyoruz ve serializer olarak kullanacagimiz serializer i da tanimliyoruz
 
-class StudentGenericListCreate(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
+- ⁡⁢⁣⁣listeyi göruntulerken get, create ederken post islemi kullaniyoruz fakat mixin icinde get,post degil list fonk nu var (listmodelmixin i import ettigmiz sayfada bunu görebiliriz) burada get yapacagiz fkat get metodunuz yok ama list icinde get yapmamiz icin gerekli butun kodlar yazili burada override yapiyoruz ⁡
+
+-⁡⁢⁣⁢ kendi get fonk muzu tanimliyoruz, yukarida inherit ettigimiz metodlar artik self in icinde dolayisiyla biz self.list dedgimizde yukaridaki metodu calistirdigimiz anlamina gelir , o metoda gittigimizde ise fonk icinde baska parametrelerde kullanildigini göruyoruz ve bu fonk kullanabilmek icin bizim yazacagimiz fonk nunda bu formata uygun olmasi gerekiyor, mixin deki list fonk icini burada kopyaliyoruz ve yeni tanimladigimiz get fonk icine yapistiriyoruz, self.list de arg ve kwarg calgirdigimiz icin get fonk icinde de onlari yazmamiz gerekiyor ⁡
+
+- ⁡⁢⁣⁢ayni sekilde get yazdigimiz gibi post fonk nunu da yaziyoruz, post islemi icin mixin klaösrune gittigimizde bunu create ismi ile tanimladiklarini göruyoruz ve self.create seklinde mixin icindeki fonk kullanmis oluyoruz
+
+-⁡⁢⁣⁢yazdigimiz classlari url sayfasinda import edip kullaniyoruz bunlar class oldugu icin class isminin sonuna asview ekliyoruz⁡
+
+⁡⁢⁢⁢class StudentGenericListCreate(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
 queryset = Student.objects.all()
 serializer_class = StudentSerializer
 
@@ -195,3 +203,95 @@ serializer_class = StudentSerializer
     # Yeni Kayıt:
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+⁡ ----------------------------------------------------------------
+
+# ListCreateAPIView
+
+# RetrieveUpdateDestroyAPIView
+
+# https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
+
+---
+
+- ListCreateAPIView ve RetrieveUpdateDestroyAPIView class lari genericapiview de yaptigimiz islemleri hazir olarak yapan class lar
+- bu classlarin yazildigi sayfaya gittigimizde get,post,put,delete islemlerini yapan bir class yazildigini göruyoruz
+- kullanacagimiz class imizi tanimliyoruz ve icine parametre olarak kullanacagimiz class i inherit ediyoruz ve bu classlari import ediyoruz
+- queryset olarak kullanacagimiz modelin object lerinin tumu ve kullanacagimiz serializer i tanimliyoruz
+- queryset ve serializer_class isimleri sabit isimler
+
+- ⁡⁢⁣⁣tek kayit (id=pk) icin gereken classimizi tanimliyoruz ve icine bu islemlerin yapan class imizi inherit ediyoruz⁡
+- ⁡⁢⁣⁢bu class in yazildigi fonk pk i default olarak kabul ediyor eger pk disinda id yazmak istersek lookup_field olarak tanimlamamiz gerekir ama burada pk kullanacagiz ve url sayfasinda url sonuna ekledigimiz kisimda <int:pk> olmali⁡
+- ⁡⁢⁣⁢yazdigimiz classlari url sayfasinda import edip kullaniyoruz bunlar class oldugu icin class isminin sonuna asview ekliyoruz
+  ⁡
+  ⁡⁢⁢⁢-- Kayıt Listeleme ve Yeni Kayıt Ekleme:
+
+class StudentListCreateAPIView(ListCreateAPIView):
+queryset = Student.objects.all()
+serializer_class = StudentSerializer
+
+-- Tek kayıt görüntüle/güncelle/sil:
+
+class StudentRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+queryset = Student.objects.all()
+serializer_class = StudentSerializer # lookup_field = "id" # Default: "pk"⁡
+
+# ----------------------------------------------------------------
+
+# ModelViewSet:
+
+# https://www.django-rest-framework.org/api-guide/viewsets/#modelviewset
+
+# ----------------------------------------------------------------
+
+- modelviewset kullanacagimiz class i tanimliyoruz (modelviewset class inin yazildgi sayfaya gidip hangi islemlerin yapildigina bakiyoruz ) ve import ediyoruz
+- queryset de modelimizin butun object sini aliyoruz ve serializer da da kullanacagimiz serializer i tanimliyoruz
+- yazdigimiz classlari url sayfasinda import edip kullaniyoruz bunlar class oldugu icin class isminin sonuna asview ekliyoruz
+
+- rf de decorators altinda action decorator u var
+- ⁡⁢⁣⁢action icinde yapmak istedigimiz metodu belirtiyoruz ve detail parametresine false yaziyoruz⁡
+- ⁡⁢⁣⁣ve fonk ismi url de belirttigimiz isimle ayni olmali count yaziyoru, self ve request standard olarak yaziyoruz⁡
+- ⁡⁢⁣⁣return icinde response ile göruntulemek istedigimiz seyi yaziyoruz, count = modelimiz olan student ve object lerinin count i⁡
+- bu yazdigmiz action ile elimizdeki model imizde kayitli kac tane data oldugunu göruntuluyebiliriz
+- bunun icin url yada router a birsey tanimlamamiza gerek olmadi
+- ⁡⁢⁣⁣burada action decorator ile bize standard olark verilmeyen bir özelligi modelviewset altinda tanimlayarak veriyi api ya gönderebiliyoruz⁡
+
+--- Tüm İşlemler:
+
+⁡⁢⁢⁢class StudentMVS(ModelViewSet):
+queryset = Student.objects.all()
+serializer_class = StudentSerializer
+
+    @action(methods=["GET"], detail=False)
+    def count(self, request):
+        return Response({
+            "count": Student.objects.count()
+        })⁡
+
+- Model view set ler url sayfasinda kullanacagimiz router yapisini destekler ⁡
+- url sayfasinda router i kullanmak icin import ediyoruz ve yazdigimiz modelviewset class ini da import ediyoruz
+- ⁡⁢⁣⁢router adinda bir degisken tanimlayip routers modulunun defaultrouter özelligini kullanmak icin ekliyoruz ⁡
+- ⁡⁢⁣⁣admin.site.register yaptigimiz gibi router site register yapiyoruz⁡
+- ⁡⁢⁣⁢register icine gidecegi urlyi yaziyoruz fkat sonunda / yok ve yanina students seklinde gelecek url isteklerine yazdigimiz modelviewset class i olan StudentMVS baksin⁡
+- ⁡⁢⁣⁣son olarak da url patters e += seklinde yazdigimiz router degiskeninine urls ekleyerek yaziyoruz⁡
+- ⁡⁢⁣⁢router yapisi bizi arkada pk isteyen ve istemeyen yapilar icin 2 tane path tanimlamaktan kurtariyor⁡
+- router modelviewset icin kullandigimiz bir özellik
+- farkli modellerimiz olsaydi onlari kullanirken router altina ekleyip gececektik yukarida ki gibi hepsini tanimlamak zorunda kalmayacagiz
+- mvs bir diger özelligi de api arayuzunde bize html form seklinde form vermesi istersek raw data seklinde de yazabiliriz istersek htmlform seklinde de
+
+# ----------------------------------------------------------------
+
+# Router for ModelViewSet
+
+router = routers.DefaultRouter()
+router.register('students', StudentMVS) # URL sonunda / yok.
+
+# router.register('another', AnotherMVS)
+
+# router.register('another', AnotherMVS)
+
+# router.register('another', AnotherMVS)
+
+# Add to paths:
+
+urlpatterns += router.urls
