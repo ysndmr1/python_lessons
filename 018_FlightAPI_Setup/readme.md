@@ -1,3 +1,5 @@
+--- Flight App---
+
 # for django project setup
 
 ```py
@@ -49,3 +51,83 @@
 - Development
 - Testing
 - Maintenance
+
+---Entity Relationship Diagram (ERD)----
+
+- drawsql sayfasindan yeni diagram cizerek basliyoruz
+- django_user, flight, passenger, reservation tablolari olacak, her tablo gerekli bilgileri ekliyoruz
+- yolcu icin adi soyadi id disinda bu yolcu bilgilerini kim olusturdu ve kim guncelledi durumlarini da ekliyoruz
+- drawsql tablolarinin ekran göruntsu klasöre eklendi
+
+---
+
+- project ve app i olusturuyoruz sonra settings.py da installed app altinda app ismini ve kullandigimiz 3rd party library leri ekliyoruz
+- temel kurulum icin migrate ve superuserlari yapiyoruz
+
+⁡⁢⁣⁢---- Swagger and Redock -----
+⁡- disariya acik public api servislerinin bir dökumantasyonu olmak zorunda, cunku sistemle irtibata gececek programcinin ne yapacagini bilmesi lazim
+
+- swagger test yapma ortami ve api dökumani swaggerda hem test yapabliriz hem de dökumantasyon olarak kullanabiliriz , redock api dökumani
+- https://drf-yasg.readthedocs.io/en/stable/readme.html
+- bu sayfadaki tek bir modulle hem dökumantasyon hem de swagger kismini halledebiliriz
+- ⁡⁢⁣⁣kurulumu icin⁡
+- pip install drf-yasg (modul indirdikten sonra pip freeze > requirements.txt)
+- installed apps e ekliyoruz eger statickfiles varsa eklemeye gerek yok
+- ⁡⁢⁢⁢INSTALLED_APPS = [
+  ...
+  'django.contrib.staticfiles', # required for serving swagger ui's css/js files
+  'drf_yasg',
+  ...
+  ]
+
+⁡⁢⁣⁣- ana klasördeki url sayfasina kodu ekliyoruz ve gerekli importlari yapiyoruz (re_path)
+⁡- ...
+⁡⁢⁢⁢from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+...
+
+schema_view = get_schema_view(
+openapi.Info(
+title="Snippets API",
+default_version='v1',
+description="Test description",
+terms_of_service="https://www.google.com/policies/terms/",
+contact=openapi.Contact(email="contact@snippets.local"),
+license=openapi.License(name="BSD License"),
+),
+public=True,
+permission_classes=[permissions.AllowAny],
+)
+
+urlpatterns = [
+re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+...
+]⁡
+
+- schema view icinde title i kendi uygulama adimizla degistiriyoruz defult v disindaki 4 basligi da yoruma aliyoruz ve public altindaki permission classes i da yoruma aliyoruz
+- bu koddan sonra api ara yuzune swagger ve redoc gelmis oldu
+- urlpatterns i += seklinde yaziyoruz
+
+------------ ⁡⁢⁣⁢DEBUG⁡ ----------------
+https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+
+- ⁡⁢⁣⁣debug toolbar kurulumu icin⁡
+- pip install django-debug-toolbar(modulden sonra requirements)
+- install app de staticfile olmasini istiyoru onu kontrol ediyoruz, static_url istiyor onu da kontrol ediyoruz
+- installed apps e debug_toolbar ekliyoruz
+- url sayfasina path ini de ekliyoruz
+  ⁡⁢⁢⁢path('**debug**/', include('debug_toolbar.urls')),
+  -middleware e "debug_toolbar.middleware.DebugToolbarMiddleware", kodunu ekliyoruz ⁡
+- bu debug modulu guvenlik icin hangi ip kullanmakla ilgili bize bir ip veriyor ve bu kodu da settings.py a ekliyoruz
+
+⁡⁢⁢⁢INTERNAL_IPS = [
+# ...
+"127.0.0.1",
+# ...
+]
+
+⁡
