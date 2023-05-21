@@ -184,3 +184,38 @@ from .production import *⁡
 - prod da bize standard format lazim degil kaldiriyoruz
 - console da calismayacagimiz icin console kismini da kaldiriyoruz
 - asagidaki default ayarlardan da console u siliyoruz ve defaultdaki level i de warning yapiyoruz
+
+-----Pg admin acma -------
+
+- yeni bir database olusturuyoruz
+- postgre yi djangoya aktaracagiz
+- vs code da pip install psycopg (requiremets)
+- prod sayfasinda database de postgresql kullancagiz ¨
+- veri tabanimizdaki verileri paylasmak istemedigimiz icn env dosyasina ekliyoruz, pg adminde yeni database olusturuken verdigimiz ismi veriyoruz, sifreyide kendi pgadmin sifremizi koyuyoruz, kalan default ayarlar ayni ise degistirmiyoruz
+  ⁡⁢⁢⁢SQL_DATABASE=django_test
+  SQL_USER=postgres
+  SQL_PASSWORD=postgres
+  SQL_HOST=localhost
+  SQL_PORT=5432⁡
+
+- prod daki databse i degistiriyoruz
+
+⁡⁢⁢⁢DATABASES = {
+"default": {
+"ENGINE": "django.db.backends.postgresql_psycopg2",
+"NAME": config("SQL_DATABASE"),
+"USER": config("SQL_USER"),
+"PASSWORD": config("SQL_PASSWORD"),
+"HOST": config("SQL_HOST"),
+"PORT": config("SQL_PORT"),
+"ATOMIC_REQUESTS": True,
+}
+}
+⁡
+
+- env deki production yapip databse i deniyoruz
+- migrate yapiyoruz veri tabanini degistirdigimiz icin
+- veri tabani yeni oldugu icin createsuperuser da yapiyoruz
+- ve pg adminde yeni adminin eklendigini göruyoruz
+- python manage.py collectstatic ile static dosyasi aciliyor her dosyanin olmasi gerektigi yerde olmasi gerekiyor django icin
+- debug false olacak ve python manage.py runserver --insecure ile calistiracagiz guvenlik problemi cikarmasin diye
