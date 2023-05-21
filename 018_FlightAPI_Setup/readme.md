@@ -169,3 +169,18 @@ from .production import *⁡
 - env den prod ve dev olarak degistirerek girecegimiz ortami secebiliriz her giriste projeyi kapatip aciyoruz
 
 --------------------- LOGGING -------------------------
+
+- https://docs.djangoproject.com/en/4.0/topics/logging/#logging doc ayarlari kontrol et
+- developmentin en altina loggoing kodunu yapistiriyoruz
+- logging icin her hangi module ihtiyacimiz yok yerlesik oldugu icin sadece ayarlari belirtmemiz yeterli
+- log isleminde sistemimize giren herkesin kaydini tutacagiz (log kullanicinin hareketleri) eger kullanici bir hata alirsa log kayitlarindan girdigi zamana bakarak da hatalari cözebiliriz
+- ⁡⁢⁣⁣formatters altinda standard kisminda eger standard ayarlarda bir log kaydi istersem altina yazdigimiz format ayarlarinda log kaydi tutacak⁡
+- ⁡⁢⁣⁣verbose diye bir sablon daha var orada da formatta belirttigimiz ayarlari sakla diyoruz⁡
+- ⁡⁢⁣⁣alttaki handlers da yakalama isleminin oldugu yer handlers altinda console da gösterecegi formatter i ve level i ayarlayabiliyoruz hangi seviyede istersek o seviyede kaydi bize gösterecek⁡
+- file da ise log kaydini bize dosyalamasini istiyoruz orada da seviyesini belirliyoruz
+- burada bana gösterirken info seviyesinde göster fakat dosyalarken warning seviyesinde dosyala diyoruz
+- ⁡⁢⁣⁣file kisminda ki filename tarih girilip tarih bilgisini datetime fonk cekip hergun icin bir log dosyasi tutulabilir diger turlu log dosyasi cok siser⁡
+- ⁡⁢⁣⁣ayni kodlari prod sayfasina da atip bazi bilgileri kaldiracagiz (dev ortaminda ayri prod ortaminda ayri loglama yapiyoruz )⁡
+- prod da bize standard format lazim degil kaldiriyoruz
+- console da calismayacagimiz icin console kismini da kaldiriyoruz
+- asagidaki default ayarlardan da console u siliyoruz ve defaultdaki level i de warning yapiyoruz
