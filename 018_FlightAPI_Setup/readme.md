@@ -125,9 +125,47 @@ https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
 - bu debug modulu guvenlik icin hangi ip kullanmakla ilgili bize bir ip veriyor ve bu kodu da settings.py a ekliyoruz
 
 ⁡⁢⁢⁢INTERNAL_IPS = [
-# ...
-"127.0.0.1",
-# ...
-]
 
-⁡
+# ...
+
+"127.0.0.1",
+
+# ...
+
+]
+--------- ⁡⁢⁣⁢Canli ortam ile test ortamini ayirma⁡ --------------
+⁡- ⁡⁢⁣⁢canli ortam ile test ortamimiz arasinda settings.py klasörumuzde degisikler olmasi lazim cunku kullanacagimiz debug toolbarini kullanicinin görmemesi gerekir⁡
+
+- wsgi doyasina gittigimizde web server ilk olarak bu dosyaya bakar oraya geldigimizde de core icindeki settings e baktigini göruyoruz bizim settigs.py klasörumuz bir modul flight dosyamizda bir modul, ⁡⁢⁣⁢bir modulu package acabilmemiz icin icine init dosyayi(bos da olsa) atmamiz yeterli ⁡
+- core icinde settings adinda bir klasör aciyoruz bu klasöru moduler bir yapiya cevirecegiz icine **init**.py dosyayi aciyoruz ve klasörumuz bir modul oluyor yani ⁡⁢⁣⁢wsgi da settings acildiginda artik bu settings klasöru ne gidecek ⁡
+- settings.py dosyasini development olarak degistirip settings klasöru icine atiyoruz
+- ⁡⁢⁣⁣c⁡⁡⁢⁣⁣ore altinda settings.py vardi fakat biz onu core altinda baska bir klasöre atip calistiracagiz o yuzden BASE_DIR in sonuna bir parent daha eklememiz gerekiyor ⁡
+- development dosyasini kopyala yapistir ile 2 tane daha aciyoruz birine base digerine production adini veriyoruz ve development ve prod dosyalarinin icini siliyoruz
+- butun kodlari base e tasidik fakat bazi ayarlarimiz dev bazi ayarlarimiz prod dosyalarindan gelsin istiyoruz, genel ayarlari base de birakacagiz
+- artik ENV dosyamizi aciyoruz ce secret key icin config import unu yapiyoruz
+- debug ve allowed host u alip dev ve prod kopyaliyoruz ve base dekini yoruma aliyoruz
+- ⁡⁢⁣⁣dev ortaminda debug true olabilir ve allowed host hepsini alabilir fakat prod ortaminda false yapiyoruz ve allowed host u 127.0.0.1 olarak degisitiriyoruz ⁡
+- ⁡⁢⁣⁣installed app de debug toolbari prod ortaminda göstermemek icin installed api debug \_toolbar ile birlikte dev ortamina kopyaliyoruz ve prod ortamina da ekleyip debug_toolbari siliyoruz ve 2 sayfayada from.base import \* ile gecerli ayarlari import ediyoruz ve basede debug_toolbari yoruma aliyoruz (installedapp ve middleware += ekliyoruz )⁡
+- ayni ⁡⁢⁣⁣sekilde middleware ide 2 dosyaya kopyaliyoruz ve toolbar icin ekledigimiz satiri middlewarede dev dosyasi altian kesip yapistiriyoruz ve prod ortaminda debugg olmayacagi icin middleware bos birakiyoruz⁡ ve baseden aldiklarimizi kaldiriyoruz
+- ⁡⁢⁣⁣database i de alip 2 sayfayada yapistiriyoruz burada dev ortaminda sqlite prod ortaminda posgresql calistir gibi degistirebiliriz bu sekilde database leri de ayiriyoruz⁡ ve base de yoruma aliyoruz
+- auth password u de 2 sayfaya yapistiriyoruz ve dev ortaminda icini bosaltip prod ortaminda oldugu gibi birakiyoruz bu sekilde biz test ederken surekli giris islemi yapmak zorunda kalmayacagiz
+- static url ayarlarina da media ekliyoruz
+  STATIC_URL = 'static/'
+  STATIC_ROOT = BASE_DIR / STATIC_URL
+  MEDIA_URL = 'media/'
+  MEDIA_ROOT = BASE_DIR / MEDIA_URL
+- en alta koydugumuz debug ip yide dev ortamina koyuyoruz prod ortaminda olmayacak
+- init dosyasinda her seferinde prod ve dev icin import ayarini degistirmemek icin bu sayfayi env klasörune göre degistiriyoruz ⁡⁢⁣⁢env dosyasina ENV=development⁡ ekliyoruz ve init dosyasina da
+
+⁡⁢⁢⁢from decouple import config
+ENVIRONMENT = config('ENV')
+
+if ENVIRONMENT == 'development':
+from .development import *
+else:
+from .production import *⁡
+
+- kodunu ekliyoruz eger gelen ENV development ise dev sayfasini degilse prod sayfasini import et seklinde degisitiriyoruz
+- env den prod ve dev olarak degistirerek girecegimiz ortami secebiliriz her giriste projeyi kapatip aciyoruz
+
+--------------------- LOGGING -------------------------
