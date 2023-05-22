@@ -1,11 +1,18 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(
+        required=True,
+        validators = [UniqueValidator(queryset=User.objects.all())]
+    )
+
     class Meta:
         model = User
         exclude = [
-            # "password",
+            # "password",
             "last_login",
             "date_joined",
             "groups",
@@ -13,13 +20,14 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        from django.contrib.auth.password_validation import validate_password # doğrulama fonksiyonu
-        from django.contrib.auth.hashers import make_password # şifreleme fonksiyonu
-        password = attrs['password'] # Password al.
-        validate_password(password) # Validation'dan geçir.
-        attrs.update(
-            {
-                'password': make_password(password) # Password şifrele ve güncelle.
-            }
-        )
+        if attrs.get('password', False):
+            from django.contrib.auth.password_validation import validate_password # doğrulama fonksiyonu
+            from django.contrib.auth.hashers import make_password # şifreleme fonksiyonu
+            password = attrs['password'] # Password al.
+            validate_password(password) # Validation'dan geçir.
+            attrs.update(
+                {
+                    'password': make_password(password) # Password şifrele ve güncelle.
+                }
+            )
         return super().validate(attrs) # Orjinal methodu çalıştır.
