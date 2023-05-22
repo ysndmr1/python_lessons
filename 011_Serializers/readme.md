@@ -43,7 +43,7 @@ bu uygulamayi yukledikten sonra settings icinde import etmemiz gerekiyor
 
 # from decouple import config
 
-ve secret key yerine key imizi alip config icinde yazacagiz
+ve secret key yerine key imizi alip config icinde yazacagiz, installed app deki secret key i .env dosyasinda saklamak icin decouple dan config import ederek kullaniyoruz
 
 # SECRET_KEY = config('SECRET_KEY')
 
