@@ -154,3 +154,82 @@ categories = ('Travel', 'Food', 'Sport', 'Economy')
 
 - bu islemlerden sonra python manage.py shell yapiyoruz
 - shell ortaminda blog modelinde olusturdugumuz faker daki run fonk nunu import ediyoruz ve run fonk calistiriyoruz ardindan fonk sonunda yazdigimiz finished komutunu gördukten sonra shell den cikiyoruz
+
+--------- ⁡⁢⁣⁢blog klasöru icin serailizer⁡ -----------
+
+- blog altinda serializer olusturuyoruz ve serailizer ve kullanacagimiz modellerimizi import ediyoruz
+- category modeli icin serializer olusturuyoruz
+- class meta ile iliskili oldugu modeli belirtiyoruz ve kullanmak istemedigimiz fieldlari belirtiyoruz
+
+⁡⁢⁢⁢class CategorySerializer(serializers.ModelSerializer):
+class Meta:
+model = Category
+exclude = []⁡
+
+- post modeli icin serializer i yaziyoruz
+- class meta ile modeli iliskilendiriyoruz ve görmek istemedigimiz field lari ekliyoruz
+- url sayfasindaki eklemden sonra api ara yuzunde yapcagimiz degisiklik
+- serializerda field tanimlama var burada user field ini bir daha tanimliyoruz user a stringrelatedfield diyoruz bu bagli oldugu category den ilgili veriyi al demek (yani user name i )
+- bu islemden sonra user sayi degil de admin olarak degisti
+
+⁡⁢⁢⁢class PostSerializer(serializers.ModelSerializer):
+user = serializers.StringRelatedField()
+user_id = serializers.IntegerField()
+
+    category = serializers.StringRelatedField()
+    category_id = serializers.IntegerField()
+
+    class Meta:
+        model = Post
+        exclude = [
+            # 'created_date',
+            # 'updated_date',
+        ]⁡
+
+------ ⁡⁢⁣⁢views.py da kullancagimiz view seti olurturma⁡ -----
+
+- views.py da serializer da yazdigimiz modelleri veri serializer modellerini import ediyoruz (serializer da modelleri import ettigimiz icin burada tekrardan modelleri import etmemize gerek yok)
+- kullancagimiz modelviewset i de import ediyoruz
+- category icin modelviewser class i yaziyoruz ve queryset icinde category modeli object sinin tumunu al diyoruz ce serializer classi icinde category icin yazdigimiz serializer i yaziyoruz
+- ayni sekilde post modeli icin viewset class ini yaziyoruz ve tanimlamalari yapiyoruz
+
+⁡⁢⁢⁢from rest_framework.viewsets import ModelViewSet
+
+from .serializers import (
+Category, CategorySerializer,
+Post, PostSerializer
+)
+
+class CategoryView(ModelViewSet):
+queryset = Category.objects.all()
+serializer_class = CategorySerializer
+
+class PostView(ModelViewSet):
+queryset = Post.objects.all()
+serializer_class = PostSerializer⁡
+
+---------- ⁡⁢⁣⁢url yapisi⁡ -----------
+
+- main dosyasi altindaki urls.py a blog ile gelenleri blog.urls sayfasina yönlendir diyoruz msin altinda router icinde category ve post u ayri ayri yazmamak icin buraya gelen bir blog istegi uzerinden category ve post sayfalarinin yönlendirmesi icin router yapisini blog klasöru altindaki url de yapacagiz
+
+⁡⁢⁢⁢urlpatterns = [
+path('admin/', admin.site.urls),
+path('user/', include('user.urls')),
+path('blog/', include('blog.urls')),
+]⁡
+
+- blog altindaki urls.py dosyasina router yapisini kuruyoruz
+- router ve kullancagimiz views lari import ediyoruz ve router a url uzantisi ve view lari ekliyoruz
+
+⁡⁢⁢⁢from django.urls import path
+from rest_framework.routers import DefaultRouter
+from blog.views import CategoryView, PostView
+
+router = DefaultRouter()
+router.register('category', CategoryView)
+router.register('post', PostView)
+
+urlpatterns = router.urls⁡
+
+- run server yaptigmizda postlari ve categoryleri göruntuleyebiliyoruz
+- sayfayi actigimizda user i 1 olarak göruyoruz bu sekilde göruntulemek istenmiyor genelde normalde user i ismiyle görmek ve user id 1 seklinde görmek bunu degistirmek icin de serializer da degisiklik yapacagiz
