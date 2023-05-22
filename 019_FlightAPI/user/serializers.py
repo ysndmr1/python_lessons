@@ -9,6 +9,11 @@ class UserSerializer(serializers.ModelSerializer):
         validators = [UniqueValidator(queryset=User.objects.all())]
     )
 
+    password = serializers.CharField(
+        required = False,
+        write_only = True,
+    )
+
     class Meta:
         model = User
         exclude = [
@@ -31,3 +36,14 @@ class UserSerializer(serializers.ModelSerializer):
                 }
             )
         return super().validate(attrs) # Orjinal methodu çalıştır.
+    
+
+#-------------- TokenSerializer ---------------
+from dj_rest_auth.serializers import TokenSerializer
+
+class UserTokenSerializer(TokenSerializer):
+
+    user = UserSerializer()
+
+    class Meta(TokenSerializer.Meta):
+        fields = ('key','user')
