@@ -1,4 +1,3 @@
-from rest_framework.viewsets import ModelViewSet
 from .serializers import (
     User, UserSerializer
 )
@@ -9,7 +8,6 @@ from .serializers import (
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
-
 
 class UserCreateView(CreateModelMixin, GenericViewSet):
     queryset = User.objects.all()
@@ -33,11 +31,11 @@ class UserCreateView(CreateModelMixin, GenericViewSet):
 
 
 # --------------------------------------------------------
-#  UserView -> Full Control for permissions.IsAdminUser
+# UserView -> Full Control for permissions.IsAdminUser
 # --------------------------------------------------------
-
+from rest_framework.viewsets import ModelViewSet
 
 class UserView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    #  permission_classes = [IsAdminUser] # Default: IsAdminUser
+    # permission_classes = [IsAdminUser] # Default: IsAdminUser

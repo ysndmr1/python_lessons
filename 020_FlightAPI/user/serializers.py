@@ -1,4 +1,3 @@
-from dj_rest_auth.serializers import TokenSerializer
 from rest_framework import serializers
 
 
@@ -6,17 +5,16 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 
-
 class UserSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        required = True,
+        validators = [UniqueValidator(queryset=User.objects.all())]
     )
 
     password = serializers.CharField(
-        required=False,
-        write_only=True,
+        required = False,
+        write_only = True,
     )
 
     class Meta:
@@ -36,14 +34,14 @@ class UserSerializer(serializers.ModelSerializer):
             validate_password(password)
             attrs.update({'password': make_password(password)})
         return super().validate(attrs)
-
+    
 
 # --------- UserTokenSerializer ------------
-
+from dj_rest_auth.serializers import TokenSerializer
 
 class UserTokenSerializer(TokenSerializer):
 
     user = UserSerializer()
-
+    
     class Meta(TokenSerializer.Meta):
-        fields = ('key', 'user')
+        fields = ('key','user')
