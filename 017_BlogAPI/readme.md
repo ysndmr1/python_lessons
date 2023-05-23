@@ -168,9 +168,12 @@ exclude = []⁡
 
 - post modeli icin serializer i yaziyoruz
 - class meta ile modeli iliskilendiriyoruz ve görmek istemedigimiz field lari ekliyoruz
-- url sayfasindaki eklemden sonra api ara yuzunde yapcagimiz degisiklik
+- ⁡⁢⁣⁢url sayfasindaki eklemden sonra api ara yuzunde yapcagimiz degisiklik⁡
 - serializerda field tanimlama var burada user field ini bir daha tanimliyoruz user a stringrelatedfield diyoruz bu bagli oldugu category den ilgili veriyi al demek (yani user name i )
 - bu islemden sonra user sayi degil de admin olarak degisti
+- ayni islemi category icinde yapiyoruz (category ismi de geliyor)
+- user ve category görduk fakat bize frontend de idleri de lazim olacak onun icin idlerini de ekliyoruz fakat idler integerField
+- db de bunlarin iliskileri kurulmus sadece göstermemiz yeterli
 
 ⁡⁢⁢⁢class PostSerializer(serializers.ModelSerializer):
 user = serializers.StringRelatedField()
@@ -186,7 +189,7 @@ user_id = serializers.IntegerField()
             # 'updated_date',
         ]⁡
 
------- ⁡⁢⁣⁢views.py da kullancagimiz view seti olurturma⁡ -----
+------ ⁡⁢⁣⁢views.py da kullancagimiz view seti olusturma⁡ -----
 
 - views.py da serializer da yazdigimiz modelleri veri serializer modellerini import ediyoruz (serializer da modelleri import ettigimiz icin burada tekrardan modelleri import etmemize gerek yok)
 - kullancagimiz modelviewset i de import ediyoruz
@@ -232,4 +235,125 @@ router.register('post', PostView)
 urlpatterns = router.urls⁡
 
 - run server yaptigmizda postlari ve categoryleri göruntuleyebiliyoruz
-- sayfayi actigimizda user i 1 olarak göruyoruz bu sekilde göruntulemek istenmiyor genelde normalde user i ismiyle görmek ve user id 1 seklinde görmek bunu degistirmek icin de serializer da degisiklik yapacagiz
+- sayfayi actigimizda user i 1 olarak göruyoruz bu sekilde göruntulemek istenmiyor genelde normalde user i ismiyle görmek ve user id 1 seklinde görmek bunu degistirmek icin de serializer da degisiklik yapacagiz (serializer bölumune git)
+
+--------- ⁡⁢⁣⁢Pagination⁡ -------------
+
+- pagination yapmak icin main > settings de > rest_framework de kodumuzu yaziyoruz
+
+⁡⁢⁢⁢'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+'PAGE_SIZE': 20,⁡
+
+------------ ⁡⁢⁣⁢User App⁡ -------------
+
+- startapp ile user app olusturuyoruz
+- settings de > installed app e ekliyoruz
+- main > urls.py icine user i da ekliyoruz
+
+⁡⁢⁢⁢urlpatterns = [
+path('admin/', admin.site.urls),
+path('user/', include('user.urls')),
+path('blog/', include('blog.urls')),
+]⁡
+
+- user altinda admin ve serializer dosyalarini aciyoruz
+- model , serializer , views , urls dosyalarini aciyoruz sirasiyla doldurmaya baslayacagiz
+- user djangoda yerlesik bir model oldugu icin yeni model yazmayacagiz db den kontrol ettigimizde user in icinde neler oldugunu görebiliriz eger ek olarak (picture gibi) bir seyler koymak istersek modele ekleriz
+
+-------- ⁡⁢⁣⁢User App > serializer⁡ -------
+
+- bir user olusturmayi yaptik simdi bir user i guncelleme yada silme islemi ekliyecegiz (admin panelden zaten yapilabiliyor bu ekleme ile api servisi uzerinden yapacagiz)
+- serializer ve user i import ediyoruz ve ardindan olusturmak istedigimiz serializer i class olarak yaziyoruz, model tabanli serializer oldugunu belirtip model olarak User i veriyoruz
+- user i api da göruntuledigmiz de gelmesini istemediklerimiz exclude icine ekliyoruz
+- ⁡⁢⁣⁢password hashlemek icin eklemeler yapiyoruz⁡
+- yazdigimiz modelserializer a gittigimizde create ve update fonk lari var fakat 2 tane fonk yazmayacagiz
+- ⁡⁢⁣⁣modelsrlzr sayfasinda validate fonk göruyoruz bu fonk gelen veriyi direk return yapmis bu fonk validate islemi arasina yeni bir sey gelirse kullanmak icin yazilmis override icin kullanabiliriz ayni zamanda validation islemi hem create hem update de kullaniliyor 2 fonk override etmemize gerek kalmiyor⁡
+- def validate i yazdiktan sonra return icinde super ile orjinal halini calistir diyoruz
+- ⁡⁢⁣⁣password u sifrelemek ve validationdan gecirecek 2 fonk import ediyoruz ⁡
+- ⁡⁢⁣⁣validate fonk icindeki attrs icinde fieldlar var burada password degiskeni olsuturp attrsden gelen password u atiyoruz ve bu password u import ettigimiz validate fonk dan geciriyoruz ⁡
+- ⁡⁢⁣⁣attrs bir dic onu guncellemek icin attrs.update icine bir dic yazip guncelle demis oluyoruz⁡
+- ⁡⁢⁣⁣password u makepassword fonk dan gecir ve password attr guncelle diyoruz⁡
+
+⁡⁢⁢⁢class UserSerializer(serializers.ModelSerializer):
+class Meta:
+model = User
+exclude = [
+
+# "password",
+
+"date_joined",
+"groups",
+"user_permissions",
+"last_login",
+]
+
+    def validate(self, attrs):
+        # ? Dogrulama Fonksiyonu
+        from django.contrib.auth.password_validation import validate_password
+        from django.contrib.auth.hashers import make_password  # ? Şifreleme Fonksiyonu
+
+        password = attrs["password"]  # ? Password al.
+        validate_password(password)  # ? Validation'dan geçir
+        # ? Password şifrele ve güncelle
+        attrs.update({"password": make_password(password)})
+
+        return super().validate(attrs)  # ? Orjinal metodu çalıştır⁡
+
+---------- ⁡⁢⁣⁢user app > views⁡ ------------
+
+- views sayfasinda restf den kullanacagimiz modelviewset import ediyoruz ve serializerde olusturdugumuz serializeri ve kullanacagimiz model i import ediyoruz
+- userview classi ni yazip icine modelviewset i veriyoruz, queryset e user objectsinin hepsini serialier class a da yeni yazdigimiz user serializer ini yaziyoruz
+
+⁡⁢⁢⁢from rest_framework.viewsets import ModelViewSet
+
+from .serializers import (
+User, UserSerializer
+)
+
+class UserView(ModelViewSet):
+queryset = User.objects.all()
+serializer_class = UserSerializer⁡
+
+---------- ⁡⁢⁣⁢user app > url⁡ ------------
+
+- rest f den router i import ediyoruz
+- router i register yap ve urlye bir yazmadan gelinen sayfaya userview baksin seklinde ekliyoruz
+- .views den userview i import ediyoruz
+- url patterns i += li degilde path seklinde yaziyoruz eger '' bos gelirse router.urls baksin seklinde (include ile birlikte ve () ici string degil)
+
+⁡⁢⁢⁢from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import UserView
+from rest_framework.authtoken.views import obtain_auth_token
+
+# ----------------------------------------------------------------
+
+# Logout function:
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['GET', 'POST'])
+def logout(request):
+request.user.auth_token.delete() # Token Sil.
+return Response({"message": 'User Logout: Token Deleted'})
+
+# ----------------------------------------------------------------
+
+router = DefaultRouter()
+router.register('', UserView)
+
+urlpatterns = [
+path('', include(router.urls)),
+path('login', obtain_auth_token),
+path('logout', logout),
+]⁡
+
+- artik user a api servisi uzerinden de ulasabiliyoruz ve get,post,put,delete islemlerini yapabiliyoruz
+- api ara yuzu uzerinden url sonuna/user/ ekleyerek user create edecegimiz sayfaya geliyoruz ve yeni bir kullanici olusturuyoruz
+- ⁡⁢⁣⁣kullanici olusunca admin panelinden farkli olarak password un hash lenmedigini göruyoruz⁡
+- admin panel de islem form uzerinden yapiliyor fakat api arayuzu uzerinden serializer ile yapiyoruz adminde sifremizi hashleyerek yaziliyor
+- ayrica admin panelde validation icin gerekli sartlar varken api de olustururken 123456 yapabiliyoruz bunun da degismesi gerekiyor
+- hem user create de hem update de sifreleme islemi yapmamiz gerekiyor
+- serializer sayfasina ekleme yapiyoruz cunku serializer cunku sistem ile arayuz arasinda convert yapan yer
+- serialzerdaki islemlerden sonra api ara yuzunde sifre update islemini hash li bir sekilde yaziyor
