@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     # Apps:
     'user',
+    'flight',
 ]
 
 MIDDLEWARE = [
