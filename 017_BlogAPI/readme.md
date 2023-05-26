@@ -357,3 +357,45 @@ path('logout', logout),
 - hem user create de hem update de sifreleme islemi yapmamiz gerekiyor
 - serializer sayfasina ekleme yapiyoruz cunku serializer cunku sistem ile arayuz arasinda convert yapan yer
 - serialzerdaki islemlerden sonra api ara yuzunde sifre update islemini hash li bir sekilde yaziyor
+
+------------ ⁡⁢⁣⁢Token Authentication⁡ --------------
+
+- aut islemleri icin settings.py sayfasina giriyoruz ve rf sayfasindan tokenauth sayfasina gidiyoruz
+- ⁡⁢⁣⁢installed apps e 'rest_framework.authtoken', ekliyoruz sisteme token la girisi eklemis olduk ve db etkileyen bir takim durumlar old icin makemigrations ve migrate islemleri ni yapmamiz gerekiyor ⁡
+- dökumandan devam ediyoruz rest_framework altina ⁡⁢⁢⁢'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication'],⁡ yapistiriyoruz aldigimiz örnekte based ve session var bunlari kullanmayacagimiz icin token ile degistiriyoruz bununla beraber sisteme giris yöntemi olarak token kullanacagimizi belirtmis oluyoruz
+- runserverdan sonra admin panele gittigimizde token in geldiginiz göruyoruz
+- suanda post lara geldigimizde butun postlar görunuyor sadece sisteme giris yapanlar erisebilmesi icin settings.py altinda rf e ⁡⁢⁢⁢'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],⁡ ekliyoruz ve permissiondan sonraki kismi sadece giris yapanlar yönetebilsin giris yapmayanlar okuyabilsin seklinde ekliyoruz ilk ekledigimizle sisteme token ile giris yap ikinci ekledigimizle ise giris yapanlar yönetebilsin digerleri sadece okuyabilsin demis oluyoruz
+- admin panelinden girdigimizde postlarin altindaki degistirme özellikleri kalktigini göruyoruz suan da sedece postlari göruntuleyebiliyoruz giris yapacagimiz denemelri postmande yapiyoruz cunku api sistemine token verdik fakat arayuzde session kullaniyor
+- bu islemden önce giris yöntemi belirlememiz gerekiyor login logout yapmamiz gerekiyor
+
+----- ⁡⁢⁣⁢login logout⁡ ---------
+
+- user dosyasi altindaki url yi aciyoruz
+- djangonun rf un hazir giris fonk var onu ekliyoruz
+- ⁡⁢⁢⁢from rest_framework.authtoken.views import obtain_auth_token⁡ import ediyoruz
+- urlpatterns altina path icinde ⁡⁢⁢⁢path('login', obtain_auth_token),⁡ ekliyoruz
+- logout icin hazir bir fonk yok onu yazacagiz
+- login icin postmande deneme yapiyoruz
+- post man e login icin olan url yi ekliyoruz normalde django da sonuna / ekliyoruz fakat bu islem icin kaldirdik, daha sonra postmande body ye username ve password u ekliyoruz post ettigimizde bize token dönuyor
+- dönen token i headers altinda auth a token olarak ekliyoruz
+- postman de auth u kladirip denedigimizde veriler gelmiyor
+- l⁡⁢⁣⁢ogout olmak icin token in silinmesi yeterli bunun icin path e logout ekliyoruz url baglantisindan sonra fonk adini giriyoruz logout adinda bir fonk yazacagiz⁡
+- ⁡⁢⁣⁢serializer log out yapiyoruz ve fonk icine request yazmayi unutmuyoruz⁡
+- ⁡⁢⁣⁢fonk na requestdeki user icideki authtoken objesi var onu sil diyoruz silinidigine dair bir message dönduruyoruz⁡
+- ⁡⁢⁣⁢göruntuleme icin apiview eklemeyi unutmuyoruz ve apiview i import ediyoruz⁡
+
+⁡⁢⁢⁢# ----------------------------------------------------------------
+
+# Logout function:
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['GET', 'POST'])
+def logout(request):
+request.user.auth_token.delete() # Token Sil.
+return Response({"message": 'User Logout: Token Deleted'})
+
+# ----------------------------------------------------------------
+
+- bir sonraki derste hazir bir modulle butun islemleri halledebilecegiz ⁡
