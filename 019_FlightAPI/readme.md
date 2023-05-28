@@ -34,7 +34,24 @@
 - baslangic icin meta altinda model olarak user i ve exclude [] seklinde yazdik
 - bu baslangictan sonra views i yazmaya basliyoruz
 - ⁡⁢⁣⁢kullanici olusturduktan sonra hashleme yapmak icin serializer icine validate fonk ekliyoruz⁡
-- ⁡⁢⁣⁣bu fonk da create ve update yaparken django verileri bir validation dan geciriyor bu validationdan gecerken passwordumuzu hash le demis olduk, hem kontrol edip hem de sifrelemis oldu⁡
+- ⁡⁢⁣⁣bu fonk da create ve update yaparken django verileri bir validation dan geciriyor bu validationdan gecerken passwordumuzu hash le demis olduk, hem kontrol edip hem de sifrelemis oldu
+- ⁡⁢⁣⁢kullaniciyi ait bir guncellemeyi password istemeden yaptirmak icin serializer⁡ a ekleme yapiyoruz; password validation islemi icin ekledigimiz validate fonk nuna bir if satiri ekliyoruz dic de get islemi yapmanin (veriyi almanin 2 yöntemi var biri [] ile cagirma yada get yazarak cagirma ) gelen attrs bilgisi icinde password de var oradan password u al ve false ekliyoruz ⁡
+- ve password olmadan guncelleme yapabiliyoruz
+- (class meta da exclude icine yazdigimiz bilgiler bize dönmesini istemedigimiz bilgiler oluyor)
+- ⁡⁢⁣⁢ayni email ile birden fazla hesap acilabiliyor bunu degistirmek icin serializer icinde emailField i tekrardan tanimlamamiz gerekiyor ⁡
+- email icin serializer icinde emailfiled oldugunu belirtiyoruz burada user icinde email var fakat mecburi degil biz bunu degistirmek icin tekrardan tanimliyoruz
+- serializerdaki charfield icine geldigimizde email in de orada yazidigini ve required in none oldugunu göruyoruz onu da true ya ceviriyoruz
+- rf icinde validator lar var env klasöru altinda package altinda restframework ordan da validators.py a geldigimizde django nun yerlesik validation fonk icinde kullanabilecegimiz bir sey olup olmadigina bakiyoruz ve unique validator a bakiyorz bu class ayni bilgiden bir daha olmamasini sagliyor bu validation u email icin kullanabiliriz
+- öncelikle import ediyoruz
+- ⁡⁢⁣⁣bunu nasil tanimliyacagimiza bakmak icin emailfield icine geliyoruz ve orada validators kullanildigini göruyoruz yani bizde validators i kullanabiliriz ⁡
+- ⁡⁢⁣⁢validators da liste icinde [] unique validator i kullan diyoruz peki bu unique lik neye göre kiyasmayi nasil yapacak UniqueValidator a baktigimizda icinde bir queryset var oana göre tanimlama yapiyor bizde burada queryset verecegiz ki onun icinde bir kiyaslama yapacak queryset = kaydettigimiz maili al user object leri icindeki butun verileri al ve ayni olmamasina dikkat et diyoruz
+- bu sekilde email zorunlu hale getirdik ve ayni email olmasin demis olduk ⁡
+- api arayuzunde olan bir kullanici mailini baska bir kullanici icin yazdigimizda artik olmuyor
+
+⁡⁢⁢⁢email = serializers.EmailField(
+required=True,
+validators=[UniqueValidator(queryset=User.objects.all())]
+)⁡
 
 ⁡⁢⁢⁢def validate(self, attrs):
 if attrs.get('password', False):
@@ -49,7 +66,7 @@ return super().validate(attrs)⁡
 
 - rf den modelviewset import ediyoruz, serializerden kullanacagimiz modeli ve o model icin yazdigimiz serializer i da import ediyoruz ve baslangic olarak userview class i icinde modelviewset i yazip query set e user object sinin hepsini serializer_class icinde yazdigimiz serializer in adini veriyoruz
 
---------- urls.py -------------
+--------- ⁡⁢⁣⁢urls.py⁡ -------------
 
 - router kullancagiz onun icin rf den defaultrouter import ediyoruz, view de yazdigimiz userview i de import ediyoruz
 - kullanacagimiz default router icin degisken adimizi veriyoruz (router)
@@ -94,3 +111,5 @@ urlpatterns += router.urls⁡
 - postmande logout islemi icinde loginden bize dönen token ile cikis yapiyoruz
 - kullanicinin tokeni ile postmande farkli islemler yapabiliyoruz guncelleme gbi user/auth/user/ yaptigimizda kullanici bilgilerini bize dönduruyor ve dönen veri ile ilgili guncelleme-degisim islemlerini put ile yapabiliyoruz dj-rest bize bu imkanlari sagliyor
 - api arayuzunden yapmaya calistigimizda header göndermedigi icin yapamiyoruz extension kullanarak tarayici uzerinden de yapabiliyoruz
+- Kullanici islemlerine dair olan butun islemleri suanda yapabiliyoruz
+- ⁡⁢⁣⁣kullaniciyi ait bir guncellemeyi password istemeden yaptirmak icin serializer a gidiyoruz⁡(her guncelleme de kullanici sifresi hatirlamayalim yada girmeyelim diye )
