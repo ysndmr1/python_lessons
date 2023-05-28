@@ -92,3 +92,5 @@ urlpatterns += router.urls⁡
 - admin panele gidip user icin email ekliyoruz email ile girisi denemek icin
 - postmande denedigimizde login post islemi ile token döndurmus oluyor bize
 - postmande logout islemi icinde loginden bize dönen token ile cikis yapiyoruz
+- kullanicinin tokeni ile postmande farkli islemler yapabiliyoruz guncelleme gbi user/auth/user/ yaptigimizda kullanici bilgilerini bize dönduruyor ve dönen veri ile ilgili guncelleme-degisim islemlerini put ile yapabiliyoruz dj-rest bize bu imkanlari sagliyor
+- api arayuzunden yapmaya calistigimizda header göndermedigi icin yapamiyoruz extension kullanarak tarayici uzerinden de yapabiliyoruz
