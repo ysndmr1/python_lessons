@@ -91,3 +91,4 @@ urlpatterns += router.urls⁡
 - normalde username ve password ile giris yapiyorduk fakat bu paket ile beraber email ve password ile giris yapabiliyoruz user/auth/login ile giris sayfasina gidebiliyoruz
 - admin panele gidip user icin email ekliyoruz email ile girisi denemek icin
 - postmande denedigimizde login post islemi ile token döndurmus oluyor bize
+- postmande logout islemi icinde loginden bize dönen token ile cikis yapiyoruz
