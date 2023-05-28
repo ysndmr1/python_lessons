@@ -39,7 +39,7 @@
 - pip install -r requirements.txt ()
 ```
 
---------- drawsql -----------------
+--------- ⁡⁢⁣⁢drawsql⁡ -----------------
 
 - drawsql sayasinda er diagram olusuturuyoruz https://drawsql.app/, veritabanini grafik olarak göruntuleyebildigimiz bir uygulama, diagrami olusturduktan sonra bize kodlari hangi sql databaseinden almak istersek ona göre baslangicda secim yapip giriyoruz
 - django user adinda django yerlesik user sistemini kullanacagimiz icin tek bir id ile olusturuyoruz
@@ -49,7 +49,7 @@
 - tablolarimizi birbiriyle iliskilendirirken foreignKey ile many to one iliski kuracagiz (foreignKey 2 positional arguman alir biri modelin ismi digeri silmek icin) post tablosundaki user id yi django user daki id ile many to one bagliyoruz
 - ayni sekilde post daki user id ile category deki id ile foreignkey olarak manytoone iliski kuruyoruz
 
---------- blog sayfasinda model olusturma ---------
+--------- ⁡⁢⁣⁢blog sayfasinda model olusturma⁡ ---------
 
 - class base ile category modeli olusturuyoruz () model oldugunu belirtiyoruz
 - category name icine yazilan verbose name , name field ine denk gelen isim icin class meta ise model deki degistirmek istedigimiz özellikler icin
@@ -105,7 +105,7 @@ verbose_name='Güncelleme T.', auto_now=True)
 
 ⁡
 
--------- FAKER --------
+-------- ⁡⁢⁣⁢FAKER⁡ --------
 
 - fake verileri almak icin
 - faker kullanmak icin server kapatiyoruz ve ⁡⁢⁣⁣pip install faker ardindan requirements⁡

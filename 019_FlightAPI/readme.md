@@ -47,10 +47,17 @@
 - ⁡⁢⁣⁢validators da liste icinde [] unique validator i kullan diyoruz peki bu unique lik neye göre kiyasmayi nasil yapacak UniqueValidator a baktigimizda icinde bir queryset var oana göre tanimlama yapiyor bizde burada queryset verecegiz ki onun icinde bir kiyaslama yapacak queryset = kaydettigimiz maili al user object leri icindeki butun verileri al ve ayni olmamasina dikkat et diyoruz
 - bu sekilde email zorunlu hale getirdik ve ayni email olmasin demis olduk ⁡
 - api arayuzunde olan bir kullanici mailini baska bir kullanici icin yazdigimizda artik olmuyor
+- ⁡⁢⁣⁣password icin de gönderdigimiz zaman guncellemesi göndermedigimiz zaman da bir degisiklik olmamasi icin serializer icinde passwordu de ayriyoruz⁡
+- required kisminda false yaparak gerekli olmadigini belirtmis oluyoruz
 
 ⁡⁢⁢⁢email = serializers.EmailField(
 required=True,
 validators=[UniqueValidator(queryset=User.objects.all())]
+)⁡
+
+⁡⁢⁢⁢password = serializers.CharField(
+required=False,
+write_only=True,
 )⁡
 
 ⁡⁢⁢⁢def validate(self, attrs):
