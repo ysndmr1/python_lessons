@@ -1,6 +1,6 @@
 # Flight Api nin devami
 
-- bir önceki ders klasörunu kopyaladik ve bu bir git gubdan cekilmis bir dosya gibi dusundugumuz icin env,.env,dbsqlite,debug.log dosyalarini siliyoruz
+- bir önceki ders klasörunu kopyaladik ve bu bir githubdan cekilmis bir dosya gibi dusundugumuz icin env,.env,dbsqlite,debug.log dosyalarini siliyoruz
 
 ```py
 # for virtual environment module
@@ -71,7 +71,48 @@ return super().validate(attrs)⁡
 
 --------- ⁡⁢⁣⁢views.py⁡ -------------
 
+- ⁡⁢⁣⁢yazdigimiz serializerlara view tanimliyoruz ve ayrica permissionslar viewlarda tanimlaniyor⁡
 - rf den modelviewset import ediyoruz, serializerden kullanacagimiz modeli ve o model icin yazdigimiz serializer i da import ediyoruz ve baslangic olarak userview class i icinde modelviewset i yazip query set e user object sinin hepsini serializer_class icinde yazdigimiz serializer in adini veriyoruz
+- userview da yazdigimiz view admin icin butun crud islemlerini yapabilir
+- bu yazdigimiz user da admin olmayan hicbir islem yapamiyor bu yuzden genel kullanima acik bir user create yazmamiz gerekiyor cunku bir kullanici site ye girerse henuz bir kullanci adi sifre olusturmadi, kullanicinin uye olmasi gerekiyor bunun icin serializer yazmamiza gerek yok cunku yetkilendirme view tarafinda
+- genel kullanima acik bir view yazmamiz gerekiyor bunun icin yeni bir usercreateview i yaziyoruz ve permissions da allowany dedigimizde herkes buraya ulasabilir ve () icinde sadece create yapabilir seklinde belirtiyoruz mixinleri inherit ediyoruz
+- url sayfasina da router register create usercreateview seklinde de eklemeyi yapiyoruz (create i userview in ustune eklememizin sebebi user view de url '' bos oldugu icin hepsini kapsiyor ve altina yazarsak görmuyor )
+- devamina da yeni kullanici kayit oldugu anda giris de yapmis olsun (frontend den gelen son kullanici)
+- bunun icin create metodunu override ediyoruz create modeli createmodelmixin icinde fonk komple kopyaliyoruz
+- fonk icinde serializer i kaydediyor biz de burada kaydettigi serializer a mudahale ediyoruz
+- fonk kopyaladiktan sonra import lari yapiyoruz
+  serializer in kaydedildigi yere yeni kullanici icin token olustur ve bu token i ciktida göster diyoruz
+
+⁡⁢⁢⁢from rest_framework.viewsets import ModelViewSet
+from .serializers import (
+User, UserSerializer
+)
+
+class UserView(ModelViewSet):
+queryset = User.objects.all()
+serializer_class = UserSerializer #  permission_classes = [IsAdminUser] # Default: IsAdminUser
+
+---
+
+class UserCreateView(CreateModelMixin, GenericViewSet):
+queryset = User.objects.all()
+serializer_class = UserSerializer
+permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        from rest_framework import status
+        from rest_framework.response import Response
+        from rest_framework.authtoken.models import Token
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # <--- User.save() & Token.create() --->
+        user = serializer.save()
+        data = serializer.data
+        token = Token.objects.create(user=user)
+        data['key'] = token.key
+        # </--->
+        headers = self.get_success_headers(serializer.data)
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)⁡
 
 --------- ⁡⁢⁣⁢urls.py⁡ -------------
 
