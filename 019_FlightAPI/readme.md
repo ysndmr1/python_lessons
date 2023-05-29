@@ -120,3 +120,33 @@ urlpatterns += router.urls⁡
 - api arayuzunden yapmaya calistigimizda header göndermedigi icin yapamiyoruz extension kullanarak tarayici uzerinden de yapabiliyoruz
 - Kullanici islemlerine dair olan butun islemleri suanda yapabiliyoruz
 - ⁡⁢⁣⁣kullaniciyi ait bir guncellemeyi password istemeden yaptirmak icin serializer a gidiyoruz⁡(her guncelleme de kullanici sifresi hatirlamayalim yada girmeyelim diye )
+
+--------- ⁡⁢⁣⁢Token Serializer⁡ --------
+
+- serializer bize sadece token bilgisi gönderiyor hem token hem kullanici bilgileri gelsin 2 kere islem yapmak durumunda kalmayalim istiyoruz
+- dj-rest-auth dökumanindan configuration icinde buluyoruz login islemini dj-rest yapiyor token icin de onun dökumanina bakmamiz gerekiyor
+- ⁡⁢⁣⁢settings de rest_auth altinda bunu degistirebiliyoruz fakat yeni bir serializer yazmamiz gerekiyor fakat mevcut ayarlari da degistirmek istemiyoruz⁡
+- serializer dosyasina geliyoruz ve önce kullanacagimiz ayari import ediyoruz
+- bu ayarin icine gidip baktigimizda sadece key oldugunu göruyoruz ve biz user bilgilerini de eklemek istiyoruz
+- ⁡⁢⁣⁢bunu icin yeni bir serializer yaziyoruz ve bu orjinal ayarlari aldigimiz TokenSerializer i oldugu gibi inherit ediyoruz gittigimiz ayarlar icinden class Meta yi da inherit ediyoruz meta icine de tokenSerializer icindeki meta yi da inherit et demis oluyoruz ⁡
+- ⁡⁢⁣⁢ilk satirda yazdigimiz serializer de orjinali oldugu gibi al alt satirda da class metayi da al demis oluyoruz eger metayi almassak ayarlardaki model i de tanimlamamiz,import etmemiz gerekiyor gerekiyor⁡
+- ⁡⁢⁣⁢metayi oldugu gibi aliyoruz ve fields a user ekle diyoruz ⁡
+- ⁡⁢⁣⁣dj-rest in mevcut token nini override etmis oluyoruz
+- ⁡ ⁡⁢⁣⁣swagger a gittigimizde tekrar execute dedigimizde token verisinin yaninda user id sininde geldigini göruyoruz id nin görunmemesi icin yukari da tanimladigim bir user serializer im vardi user bilgilerimi oradan al seklinde user ekliyoruz swagger de tekrar calistirdigimizda hem token verisinin hem user verilerinin geldigini göruyoruz ⁡
+
+⁡⁢⁢⁢from dj_rest_auth.serializers import TokenSerializer
+⁡
+⁡⁢⁢⁢class UserTokenSerializer(TokenSerializer):
+
+    user = UserSerializer()
+
+    class Meta(TokenSerializer.Meta):
+        fields = ('key', 'user')⁡
+
+- yaptigimiz degisiklikleri sisteme de bildirmemiz gerekiyor bunun icin core > settings > base > e dokumantasyondaki ayari kopyaliyoruz
+- bunu yazarken '' icini user ve serializer i da yazdigimiz userserializer olarak degistiriyoruz
+
+⁡⁢⁢⁢# DJ-REST-AUTH SETTINGS:
+REST_AUTH = {
+'TOKEN_SERIALIZER': 'user.serializers.UserTokenSerializer',
+}⁡
