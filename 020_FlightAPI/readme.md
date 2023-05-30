@@ -42,7 +42,29 @@ class Passenger(models.Model):
     gender = models.CharField(max_length=1, choices=GENDERS, default='0')
     created = models.ForeignKey(User, on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now=True)⁡
+    updated_time = models.DateTimeField(auto_now=True)
+
+    # -----------------------------------------------------------
+
+# --------------------- Passenger ---------------------------
+
+# -----------------------------------------------------------
+
+class Passenger(FixModel):
+
+    GENDERS = (
+        ('F', 'Female'),
+        ('M', 'Male'),
+        ('0', 'Prefer Not To Say'),
+    )
+
+    first_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
+    email = models.EmailField()
+    gender = models.CharField(max_length=1, choices=GENDERS, default='0')
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'⁡
 
 - siradaki modelimiz ucuslar erd den bakiyoruz
 - class olusturarak basliyoruz ve model oldugunu belirtiyoruz
@@ -90,15 +112,51 @@ class Passenger(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
 
+    # --------------------- Flight ------------------------------
+
+# -----------------------------------------------------------
+
+class Flight(FixModel):
+
+    AIRLINES = (
+        ('THY', 'Turkish Airlines'),
+        ('SUN', 'Sun Airlines'),
+        ('SEL', 'Selim Airlines'),
+    )
+
+    CITIES = (
+        (1, 'Adana'),
+        (6, 'Ankara'),
+        (7, 'Antalya'),
+        (9, 'Aydın'),
+        (10, 'Balıkesir'),
+        (16, 'Bursa'),
+        (32, 'Isparta'),
+        (34, 'Istanbul'),
+        (35, 'Izmir'),
+        (44, 'Malatya'),
+        (52, 'Ordu'),
+    )
+
+    flight_number = models.CharField(max_length=64)
+    airline = models.CharField(max_length=3, choices=AIRLINES)
+    departure = models.PositiveSmallIntegerField(choices=CITIES)
+    departure_date = models.DateField()
+    arrival = models.PositiveSmallIntegerField(choices=CITIES)
+    arrival_date = models.DateField()
+
+    def __str__(self):
+        return f'{self.flight_number} # {self.airline}'
+
 ⁡
 
 - sonraki model reservasyonlar (model isimlerinde cogul kullanmiyoruz)
 - reservation ilk field i ucus erd den bakiyoruz
 - bu class in model oldugunu belirtiyoruz
 - flight in iliski tipi foreignkey ve iliski kuracagi model flight modeli yukarida yazdik delete durumunu da yaziyoruz
-- diger iliski durumu da passenger bir ucusa birden fazla yolcu ekleyebilmek icin manytomany yapiyoruz(mtm olunca bir ucusa yolcu eklemek istedigimiz zaman yeni bir kayit olusturacak )
+- diger iliski durumu da passenger bir ucusa birden fazla yolcu ekleyebilmek icin manytomany yapiyoruz(mtm olunca bir ucusa yolcu eklemek istedigimiz zaman yeni bir kayit olusturacak ) dersin devaminda sonrada foreignkey olarak degistirecegiz
 
-# --------------------- Reservation -------------------------
+⁡⁢⁢⁢# --------------------- Reservation -------------------------
 
 # -----------------------------------------------------------
 
@@ -108,3 +166,36 @@ passenger = models.ManyToManyField(Passenger)
 created = models.ForeignKey(User, on_delete=models.CASCADE)
 created_time = models.DateTimeField(auto_now_add=True)
 updated_time = models.DateTimeField(auto_now=True)
+
+# --------------------- Reservation -------------------------
+
+# -----------------------------------------------------------
+
+class Reservation(FixModel):
+flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
+passenger = models.ManyToManyField(Passenger)
+
+    def __str__(self):
+        return f'{self.flight} [{self.passenger.count()}]'⁡
+
+- modellerin def **str** lerini yaziyoruz modele göre duzenlemesini yapiyoruz
+- ⁡⁢⁣⁣modelleri yazdigimizda hepsinde de created,createdtime ve updated time oldugunu göruyoruz bunlara model standardi da diyebiliriz, bunlarin sayisi daha fazla da olabilirdi mesela uzerine ekleme yapmamiz gerekti tekrardan bu standardlari da yeni modele ekleyecek miyiz (bazen bu standardlar 10 taneden fazla olabiliyor) bunun icin fixmodel yazacagiz⁡
+  -⁡⁢⁣⁣ standardlari bu fixmodel icine alacagiz bundan sonra yazacagimiz diger modellerde bu fix i kullanmak icin inherit edecegiz ve tekrardan yazmamiz gerekmeyecek⁡
+- ⁡⁢⁣⁣2. fix model zaten bir model bunun icin cagirdigimiz model icinde tekrardan model oldugunu belirtmemize gerek yok sadece model adiyla cagirsak yeterli⁡
+- simdiye kadar yazdigimiz modelleri fix modele göre bir daha guncelliyoruz
+
+⁡⁢⁢⁢# --------------------- FixModel ----------------------------
+
+# -----------------------------------------------------------
+
+class FixModel(models.Model):
+created = models.ForeignKey(User, on_delete=models.CASCADE)
+created_time = models.DateTimeField(auto_now_add=True)
+updated_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True # dont create table.⁡
+
+-⁡⁢⁣⁢ modeli bitirdikten makemigration ve migrate yapacagiz ve django bunlari db e bir tablo olarak atayacak fakat eger fix modelinin db e eklenmesini istemiyorsak class meta ile abstract ile modeli soyut tabloya dönusturme demis oluyoruz
+
+- ⁡
