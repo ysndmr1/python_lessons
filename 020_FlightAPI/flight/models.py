@@ -1,10 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+# -----------------------------------------------------------
+# --------------------- FixModel ----------------------------
+# -----------------------------------------------------------
+class FixModel(models.Model):
+    created = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True # dont create table.
+
+
 # -----------------------------------------------------------
 # --------------------- Passenger ---------------------------
 # -----------------------------------------------------------
-class Passenger(models.Model):
+class Passenger(FixModel):
 
     GENDERS = (
         ('F', 'Female'),
@@ -16,20 +29,20 @@ class Passenger(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField()
     gender = models.CharField(max_length=1, choices=GENDERS, default='0')
-    created = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 # -----------------------------------------------------------
-# --------------------- Flight ---------------------------
+# --------------------- Flight ------------------------------
 # -----------------------------------------------------------
-class Flight(models.Model):
+class Flight(FixModel):
 
     AIRLINES = (
         ('THY', 'Turkish Airlines'),
         ('SUN', 'Sun Airlines'),
-        ('SWD', 'Sweden Airlines'),
+        ('SEL', 'Selim Airlines'),
     )
 
     CITIES = (
@@ -52,17 +65,17 @@ class Flight(models.Model):
     departure_date = models.DateField()
     arrival = models.PositiveSmallIntegerField(choices=CITIES)
     arrival_date = models.DateField()
-    created = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.flight_number} # {self.airline}'
 
 
 # -----------------------------------------------------------
 # --------------------- Reservation -------------------------
 # -----------------------------------------------------------
-class Reservation(models.Model):
+class Reservation(FixModel):
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE)
     passenger = models.ManyToManyField(Passenger)
-    created = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.flight} [{self.passenger.count()}]'
