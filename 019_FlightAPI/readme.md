@@ -74,14 +74,16 @@ return super().validate(attrs)⁡
 - ⁡⁢⁣⁢yazdigimiz serializerlara view tanimliyoruz ve ayrica permissionslar viewlarda tanimlaniyor⁡
 - rf den modelviewset import ediyoruz, serializerden kullanacagimiz modeli ve o model icin yazdigimiz serializer i da import ediyoruz ve baslangic olarak userview class i icinde modelviewset i yazip query set e user object sinin hepsini serializer_class icinde yazdigimiz serializer in adini veriyoruz
 - userview da yazdigimiz view admin icin butun crud islemlerini yapabilir
-- bu yazdigimiz user da admin olmayan hicbir islem yapamiyor bu yuzden genel kullanima acik bir user create yazmamiz gerekiyor cunku bir kullanici site ye girerse henuz bir kullanci adi sifre olusturmadi, kullanicinin uye olmasi gerekiyor bunun icin serializer yazmamiza gerek yok cunku yetkilendirme view tarafinda
-- genel kullanima acik bir view yazmamiz gerekiyor bunun icin yeni bir usercreateview i yaziyoruz ve permissions da allowany dedigimizde herkes buraya ulasabilir ve () icinde sadece create yapabilir seklinde belirtiyoruz mixinleri inherit ediyoruz
-- url sayfasina da router register create usercreateview seklinde de eklemeyi yapiyoruz (create i userview in ustune eklememizin sebebi user view de url '' bos oldugu icin hepsini kapsiyor ve altina yazarsak görmuyor )
+- ⁡⁢⁣⁣bu yazdigimiz user da admin olmayan hicbir islem yapamiyor bu yuzden genel kullanima acik bir user create yazmamiz gerekiyor cunku bir kullanici site ye girerse henuz bir kullanci adi sifre olusturmadi, kullanicinin uye olmasi gerekiyor bunun icin serializer yazmamiza gerek yok cunku yetkilendirme view tarafinda⁡
+- ⁡⁢⁣⁣genel kullanima acik bir view yazmamiz gerekiyor bunun icin yeni bir usercreateview i yaziyoruz ve ⁡⁢⁣⁢permissions da allowany⁡ ⁡⁢⁣⁣dedigimizde herkes buraya ulasabilir ve (CreateModelMixin, GenericViewSet) icinde sadece create yapabilir seklinde belirtiyoruz mixinleri inherit ediyoruz⁡
+- ⁡⁢⁣⁢url sayfasina da router register create usercreateview seklinde de eklemeyi yapiyoruz (create i userview in ustune eklememizin sebebi user view de url '' bos oldugu icin hepsini kapsiyor ve altina yazarsak görmuyor )⁡
 - devamina da yeni kullanici kayit oldugu anda giris de yapmis olsun (frontend den gelen son kullanici)
-- bunun icin create metodunu override ediyoruz create modeli createmodelmixin icinde fonk komple kopyaliyoruz
+- ⁡⁢⁣⁣bunun icin create metodunu override ediyoruz create modeli createmodelmixin icinde fonk komple kopyaliyoruz⁡
 - fonk icinde serializer i kaydediyor biz de burada kaydettigi serializer a mudahale ediyoruz
 - fonk kopyaladiktan sonra import lari yapiyoruz
-  serializer in kaydedildigi yere yeni kullanici icin token olustur ve bu token i ciktida göster diyoruz
+- createModelMixin de self.perform_create(serializer) serilizer kaydediliyor iste buraya mudahale etmis oluyoruz
+- override ederken kaydettigi serializer a git create edilen yeni kullanici icin bir de token olustur ve bu token i ciktida göste demis oluyoruz
+- serializer in kaydedildigi yere yeni kullanici icin token olustur ve bu token i ciktida göster diyoruz
 
 ⁡⁢⁢⁢from rest_framework.viewsets import ModelViewSet
 from .serializers import (
@@ -191,3 +193,5 @@ urlpatterns += router.urls⁡
 REST_AUTH = {
 'TOKEN_SERIALIZER': 'user.serializers.UserTokenSerializer',
 }⁡
+
+------ Bu projedeki user baska projelerde de kullanilabilir her seyi hazir bir user oldu --------
