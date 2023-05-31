@@ -198,4 +198,202 @@ updated_time = models.DateTimeField(auto_now=True)
 
 -⁡⁢⁣⁢ modeli bitirdikten makemigration ve migrate yapacagiz ve django bunlari db e bir tablo olarak atayacak fakat eger fix modelinin db e eklenmesini istemiyorsak class meta ile abstract ile modeli soyut tabloya dönusturme demis oluyoruz
 
-- ⁡
+------------- ⁡⁢⁣⁢Serializer⁡ -----------------
+
+- import yaparak basliyoruz serializer i rf den
+- modellerden de yazdigimiz modelleri import ediyoruz
+- passenger icin serializer yaziyoruz baslangicta bunun bir serialzier old nu belirtiyoruz fakat sonrada fix ekleyince onunla degistiriyoruz fix de serializer old icin () bir daha serialzer diye belirtmemize gerek yok
+- meta da baz aldigi model olarak passenger i yaziyoruz ve exclude u bos birakiyoruz
+
+⁡⁢⁢⁢# --------------------- PassengerSerializer -----------------
+
+# -----------------------------------------------------------
+
+class PassengerSerializer(FixSerializer):
+
+    gender_text = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Passenger
+        exclude = []
+
+    def get_gender_text(self, obj):
+        return obj.get_gender_display()⁡
+
+- flight icin ser yazyoruz meta da baz aldigi modeli flight diyoruz
+
+⁡⁢⁢⁢# --------------------- FlightSerializer --------------------
+
+# -----------------------------------------------------------
+
+class FlightSerializer(FixSerializer):
+
+    departure_text = serializers.SerializerMethodField() # return from get_field_name()
+    arrival_text = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Flight
+        fields = (
+            "id",
+            "created",
+            "created_id",
+            "departure_text",
+            "arrival_text",
+            "created_time",
+            "updated_time",
+            "flight_number",
+            "airline",
+            "departure",
+            "departure_date",
+            "arrival",
+            "arrival_date",
+            "get_airline_display", # dont need SerializerMethodField.
+        )
+
+    # SerializerMethodField()
+    def get_departure_text(self, obj):
+        return obj.get_departure_display()
+
+    # SerializerMethodField
+    def get_arrival_text(self, obj):
+        return obj.get_arrival_display()⁡
+
+- reservation icinde yazdik ve baslangic icin meta yi yazip gectik diger özellikleri sonradan ekleyerek gidiyoruz
+
+⁡⁢⁢⁢# --------------------- ReservationSerializer ---------------
+
+# -----------------------------------------------------------
+
+class ReservationSerializer(FixSerializer):
+
+    flight_id = serializers.IntegerField(write_only=True)
+    passenger_ids = serializers.ListField(write_only=True)
+
+    flight = FlightSerializer(read_only=True) # ForeingKey()
+    passenger = PassengerSerializer(read_only=True, many=True) # ManyToMany()
+
+    class Meta:
+        model = Reservation
+        exclude = []
+
+    def create(self, validated_data):
+        validated_data["passenger"] = validated_data.pop('passenger_ids')
+        return super().create(validated_data)⁡
+
+- model de fix tanimlamistik aynisini ser icinde yapacagiz
+- baslangicta sadece adini yaziyoruz ve pass veriyoruz diger ser lari yazdikca fix i de degistirecegiz
+- yazdigimiz seri () lerine fixSerializer yaziyoruz
+
+# --------------------- FixSerializer -----------------------
+
+# -----------------------------------------------------------
+
+class FixSerializer(serializers.ModelSerializer):
+
+    created = serializers.StringRelatedField()
+    created_id = serializers.IntegerField(required=False)
+
+    def create(self, validated_data):
+        validated_data['created_id'] = self.context['request'].user.id
+        return super().create(validated_data)
+
+------------ ⁡⁢⁣⁢views⁡ -------------
+
+- rf den kullanacagimiz viewmodel setini , serializer a yazdigimiz model ve serial lari da import ediyoruz
+- fix mantigini burada da kullaniyoruz modelviewset ini yaziyoruz ve suanda ortak bir sey olmadigi icin pass yaziyoruz
+
+⁡⁢⁢⁢# --------------------- FixView -----------------------------
+
+# -----------------------------------------------------------
+
+class FixView(ModelViewSet):
+pass⁡
+
+- passenger icin view yaziyoruz yazdigimiz fixviewden inherit ediyoruz
+- queryset icin passengerdaki objelerin tumu ve kullanicagimiz serializer i da yaziyoruz
+- aynilarini flight ve reservation icin de yaziyoruz
+
+⁡⁢⁢⁢# --------------------- PassengerView -----------------------
+
+# -----------------------------------------------------------
+
+class PassengerView(FixView):
+queryset = Passenger.objects.all()
+serializer_class = PassengerSerializer
+
+# --------------------- FlightView --------------------------
+
+# -----------------------------------------------------------
+
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+class FlightView(FixView):
+queryset = Flight.objects.all()
+serializer_class = FlightSerializer
+permission_classes = [IsAuthenticatedOrReadOnly]
+
+# -----------------------------------------------------------
+
+# --------------------- ReservationView ---------------------
+
+# -----------------------------------------------------------
+
+class ReservationView(FixView):
+queryset = Reservation.objects.all()
+serializer_class = ReservationSerializer⁡
+
+------ ⁡⁢⁣⁢url⁡ --------------
+
+- router icin defrouter i import ediyoruz ardindan views larimizi import ediyoruz
+- ve router icinde flightdan sonra url ye passenger isteklerine passengerview baksin ve digerleri de ayni sekilde olsun diye ekliyoruz
+
+⁡⁢⁢⁢# '/flight/':
+urlpatterns = [
+]
+
+# ---------- Router ----------
+
+from rest_framework.routers import DefaultRouter
+from .views import (
+PassengerView,
+FlightView,
+ReservationView
+)
+router = DefaultRouter()
+router.register('passenger', PassengerView)
+router.register('flight', FlightView)
+router.register('reservation', ReservationView)
+urlpatterns += router.urls⁡
+
+------------ ⁡⁢⁣⁢admin⁡ ------------
+
+- admin sayfasina gelip kullanacagimiz modelleri import ediyoruz
+- admin site da kullanacaklarimizi da ekliyoruz
+
+⁡⁢⁢⁢from django.contrib import admin
+from .models import (
+Passenger,
+Flight,
+Reservation
+)
+
+admin.site.register(Passenger)
+admin.site.register(Flight)
+admin.site.register(Reservation)⁡
+
+- ardindan runserver yapip yaptiklarimizi kontrol ediyoruz
+- /flight bizim yazdigimiz app ardindan birdaha /flight/ yazdigimizda view göruntuleniyor ve giris izni yok diyor cunku def olarak adminlere erisim izni verdik (if admin user) sisteme admin olugumuzu belirtmemiz gerekiyor admin panel de admin icin token olusturuyoruz
+- token i modheader extensionunda request ekleyerek gönderiyoruz ve api arayuzunde erisim geldi
+- diger url leri de denedigimizde calistiklarini göruyoruz
+- yeni bir flight ekledigimizde bize kullanici soruyor admin panelinde(api arayuzunde ise created id gerekiyor) bunu otomatiklestirmek icin
+- created id 3 modelde de vardi bunun icin serializer sayfasina gidiyoruz fixseri icine created id icin bu bir serializer dir ve integer kullan ve mecburi olarak isteme seklinde belirtiyoruz ve created icinde stringfield ekliyoruz kullanici adi su id si su seklinde db tablosunda görunuyor
+- created id kullanici olusturuldugu zaman bir kere tanimlanacak o kadr degisiklik yapmak icin modelserializer icinde create fonk yazildigi yere gidip fonk override etmek icin kopyaliyoruz
+- validated data icinde flightnumber,airline.... fieldlarinin hepsi var (validated date bir dic []) diyorum ki sen created id yi bana sorma bunu self.context ile giris yapmis user id den al
+- bu sekilde created id göndermeden bir passenger fln eklerken bir kullaniciyi secmem gerekmeden halletmis olduk
+- ve bunu fix de yaptigimiz icin digerleri icin de gecerli olacak
+
+created = serializers.StringRelatedField()
+created_id = serializers.IntegerField(required=False)
+
+def create(self, validated_data):
+validated_data['created_id'] = self.context['request'].user.id
+return super().create(validated_data)
