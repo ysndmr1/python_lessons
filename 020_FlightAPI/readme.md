@@ -155,6 +155,7 @@ class Flight(FixModel):
 - bu class in model oldugunu belirtiyoruz
 - flight in iliski tipi foreignkey ve iliski kuracagi model flight modeli yukarida yazdik delete durumunu da yaziyoruz
 - diger iliski durumu da passenger bir ucusa birden fazla yolcu ekleyebilmek icin manytomany yapiyoruz(mtm olunca bir ucusa yolcu eklemek istedigimiz zaman yeni bir kayit olusturacak ) dersin devaminda sonrada foreignkey olarak degistirecegiz
+- str icinde ucus ve [] icinde bu ucusta kac yolcu oldugu gösterilecek admin panelinde
 
 ⁡⁢⁢⁢# --------------------- Reservation -------------------------
 
@@ -204,6 +205,7 @@ updated_time = models.DateTimeField(auto_now=True)
 - modellerden de yazdigimiz modelleri import ediyoruz
 - passenger icin serializer yaziyoruz baslangicta bunun bir serialzier old nu belirtiyoruz fakat sonrada fix ekleyince onunla degistiriyoruz fix de serializer old icin () bir daha serialzer diye belirtmemize gerek yok
 - meta da baz aldigi model olarak passenger i yaziyoruz ve exclude u bos birakiyoruz
+- f⁡⁢⁣⁢light da dep ve isim eklemesi yaptiktan sonra burada da aynisini gender icin yapiyoruz ve gender text ile serialzermodelfield i kullanip get ile göruntulemek istedigimiz degeri ekliyoruz ⁡
 
 ⁡⁢⁢⁢# --------------------- PassengerSerializer -----------------
 
@@ -221,6 +223,12 @@ class PassengerSerializer(FixSerializer):
         return obj.get_gender_display()⁡
 
 - flight icin ser yazyoruz meta da baz aldigi modeli flight diyoruz
+- verileri api arayuzunde göruntuledigimizde departure=1 göruyoruz fkat bunun ne oldugunu belirlemek icin flight serial ekleme yapiyoruz
+- ⁡⁢⁣⁣yeni bir field ekliyoruz veriler icin de görunecek (departure_text) ve serializer a bunun icin bir metod olusturacagimizi söyluyoruz (serializers.SerializerMethodField()) onun degerini yazdir, o metod da get ile baslamali ve verdigimiz isimle ayni olmali (def get_departure_text(self, obj):)⁡
+- ⁡⁢⁣⁢burada serializer a modelden bagimsiz bir field eklemis oluyoruz (göruntuleme amacli,göndermek zorunda oldugumuz bir deger degil) departure_text e bunun ciktisini methodfielddan alacak ve metodu da get ile tanimlamis olduk (departure 1 fakat departure text de sehir hangisi yazsin istiyorsak) modelde departure i choises olarak tanimladik bu django özelligi choices icin özel (sehir rakamini zaten göruyoruduk bunnla degerini de görmus olacagiz ) bunu da return obj.get_departure_display() ile yapiyoruz get ile departure u aliyoruz ve display ile göruntuluyoruz
+- ayni mantigi arrival icinde yapiyoruz ⁡(departure da text ini biz öyle istedigimiz icin yaptik sadece rakam degil isim gözuksun istersek text olmadan yazabiliriz)
+- baska bir sekilde ekleme icin ise exclude degil field kullanmamiz gerekiyor, ayni durumu havayolu sirket ismi görunsun icin yapmak istesek önce field icine görmek istedigimiz alanlari ekliyoruz ve sadece en alta get ile fieldname_display dersek direk choices daki ismi getirmis oluyoruz stringmetod a gerek kalmdi bu sekilde
+- field ile exclude farkinda eger model e bir sey eklememiz gerekirse exclude da sadece modelde eklemek yeterli fakat field icin model e eklersek field a da eklememiz gerekiyor
 
 ⁡⁢⁢⁢# --------------------- FlightSerializer --------------------
 
@@ -259,6 +267,8 @@ class FlightSerializer(FixSerializer):
         return obj.get_arrival_display()⁡
 
 - reservation icinde yazdik ve baslangic icin meta yi yazip gectik diger özellikleri sonradan ekleyerek gidiyoruz
+- pass ve flight a ekleme yaptiktan sonra reser a bakyoruz ve api arayuzunde flight da 1 görunuyor, fix ser da created id icin yaptigimizi burda flight icin yapiyoruz flight ve flight id ekliyoruz flight da
+- reservation icin api arayuzunde passenger a baktigimizda coklu veri old göruyoruz 1,2 yaziyor fkat bilgiler yok bunun icin passenger i tanimliyoruz ve passengerSerializer veriyoruz (many=True old belirtiyoruz ) aynisini flight icin yazdigimizda reservation icin flight bilgilerinin de geldiginiz göruyoruz 1 numarali reservation göruntuledik ve bu bilgi altinda flight da passenger i da modellerde olusturudugumuz field leri ile birlikte göruntuluyor
 
 ⁡⁢⁢⁢# --------------------- ReservationSerializer ---------------
 
@@ -284,7 +294,7 @@ class ReservationSerializer(FixSerializer):
 - baslangicta sadece adini yaziyoruz ve pass veriyoruz diger ser lari yazdikca fix i de degistirecegiz
 - yazdigimiz seri () lerine fixSerializer yaziyoruz
 
-# --------------------- FixSerializer -----------------------
+⁡⁢⁢⁢# --------------------- FixSerializer -----------------------
 
 # -----------------------------------------------------------
 
@@ -295,7 +305,7 @@ class FixSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['created_id'] = self.context['request'].user.id
-        return super().create(validated_data)
+        return super().create(validated_data)⁡
 
 ------------ ⁡⁢⁣⁢views⁡ -------------
 
@@ -321,7 +331,12 @@ class PassengerView(FixView):
 queryset = Passenger.objects.all()
 serializer_class = PassengerSerializer
 
-# --------------------- FlightView --------------------------
+⁡⁢⁣⁢- ucuslar da yetkilendirme yapmak icin bu kisma ekleme yapiyoruz
+
+- rf persmissindan isauth import ediyoruz ve herkes okuyabilir fakat sadece giris yapmis kisiler tarafindan olusturulabilir onun icinde permission_classes ekliyoruz ve liste [] icinde views in izinlerini ekliyoruz
+- bir views a permission bu sekilde ekleniyor ⁡
+
+⁡⁢⁢⁢# --------------------- FlightView --------------------------
 
 # -----------------------------------------------------------
 
@@ -391,9 +406,14 @@ admin.site.register(Reservation)⁡
 - bu sekilde created id göndermeden bir passenger fln eklerken bir kullaniciyi secmem gerekmeden halletmis olduk
 - ve bunu fix de yaptigimiz icin digerleri icin de gecerli olacak
 
-created = serializers.StringRelatedField()
+⁡⁢⁢⁢created = serializers.StringRelatedField()
 created_id = serializers.IntegerField(required=False)
 
 def create(self, validated_data):
 validated_data['created_id'] = self.context['request'].user.id
-return super().create(validated_data)
+return super().create(validated_data)⁡
+
+- yazdiklarimizi kullanabilmek ve eksiklik var mi görmek icin admin panel uzerinden db e veri ekliyoruz passenger,flight vb
+- views de permission yaptiktan sonra api arayuzunde kontrol ediyoruz ve ucus bilgileri geliyor fakar departure 1 seklinde bir bilgi var bu 1 nedir buna bakmak icin serializer a gidiyoruz
+- serializer yaptigimiz eklemelerle flight da isimizi bitirmis olduk passenger a geciyoruz
+- passenger a da eklemeleri yaptiktan sonra reservation a geciyoruz
