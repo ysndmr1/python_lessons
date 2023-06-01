@@ -1,0 +1,14 @@
+FROM python:3.10.8-slim-bullseye
+# docker icinde pythonun saglikli calisabilmesi icin 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /backend 
+
+COPY . . 
+
+RUN pip install -r requirements.txt --no-cache-dir
+
+CMD python manage.py runserver 0.0.0.0:8000
+#optional:
+EXPOSE 8000
