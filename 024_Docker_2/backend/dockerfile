@@ -6,9 +6,11 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /backend 
 
 COPY . . 
-
+# no cache optional
 RUN pip install -r requirements.txt --no-cache-dir
 
 CMD python manage.py runserver 0.0.0.0:8000
 #optional:
 EXPOSE 8000
+
+# docker system prune -a -f hepsini siler 
