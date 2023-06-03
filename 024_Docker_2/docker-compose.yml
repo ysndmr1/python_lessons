@@ -1,0 +1,23 @@
+version: "3.9" # opsiyonel.
+
+services:
+  frontend:
+    # container_name: frontend # (default:key)
+    image: "docker-compose-frontend" # image_name
+    build: ./frontend # Dockerize edilecek klasör (dockerfile)
+    ports: # dış/iç port numaraları
+      - 3000:3000
+      - 80:3000
+    restart: on-failure # hata anında tekrar çalıştır.
+    depends_on: # önce aşağıdakileri çalıştır.
+      - backend # aşağıda tanımlandı.
+
+  backend:
+    # container_name: backend # (default:key)
+    image: "docker-compose-backend" # image_name
+    build: ./backend # Dockerize edilecek klasör (dockerfile)
+    ports: # dış/iç port numaraları
+      - 8000:8000
+    restart: on-failure # hata anında tekrar çalıştır.
+    volumes: # fiziksel yollar (external:internal)
+      - $PWD/backend/db.sqlite3:/backend/db.sqlite3
