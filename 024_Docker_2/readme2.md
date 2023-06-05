@@ -71,3 +71,20 @@ RUN npm install
 
 CMD npm start
 EXPOSE 3000
+
+- bir server a birden fazla ip giris yapabilir, ip dijital dunyanin yol göstericisi gibi görebiliriz
+- örnek olarak tarayici clarusway in server ip sine gidiyor o ip ye karsilik gelen server i buluyor ve clarusway in icerigini istiyor server de html css kodlarini veriyor tarayici da aldigi bu kodlar ile yayin yapiyor
+- peki port bu durum da nerede
+- bir server var ve bu server a giden bir ip var fkat web server i var email kontrol eden server var yani cesitli serverlar var peki server kendi icerisinde bu yönlendirmeyi nasil yapiyor, iste bu durumda devreye portlar giriyor ip server in kendisine gider portlar da server in icindeki alanlara gider exp 80 portu http portudur , 443 https portudur piyasa standardir bunlar
+- docker image silmek icin $ docker rmi 3karakter seklinde idi container acilmis bir image icin önce container i silmemiz lazim onun icin $ docker rm 3 karakter olarak yada tum container lar icin $ docker container prune -f ile yapiyorduk
+- 80 portu ile calistirmak icin docker -d -p 80:3000 imagename bundan önce 3000:3000 portunu da acmistik 2 port da aktif olarak calisabiliyor 80 port u default oldgu icin tarayici da sadece localhost olarak calistirabiliyoruz
+- docker hub da image gönderip cekmek icin giris yapiyoruz
+- terminalden docker hub a girdigimizi belirtmek icin $ docker login yapiyoruz eger desktop da giris yapilmis ve acilmissa otomatik olark algiliyor
+- docker hub da manuel bir repo olusturuyoruz repo ismini giriyoruz ve bos repomuz acildi simdi lokaldeki repoyu gönderme islemi yapacagiz ama dirak push reponame ile yapamiyoruz onun icin push pull icin kullaniciadi/reponame seklinde olmali yani $ docker tag backend_image yasind/backend_image seklinde ismini de degistiriyoruz ardindan $docker push yasind/backend_image seklinde push pull islemlerini yapabiliriz
+- hub a gittigimizde reponun doldugunu görebiliyoruz
+- repo olusturmadan da yeni repo olusturabiliriz $ docker tag backend_image yasind/backend_image2 $ docker push yasind/backend_image2 seklinde yapabiliriz
+- docker tag backend_image yasind/backend_image:v1 seklinde guncelleme de yapabiliyoruz push icin docker push yasind/backend_image:v1 seklinde gönderebiliyoruz mevcut reponun icine
+- ayni sekilde frontend icinde yapiyoruz
+- pull islemi icinde pull yapmamiz yeterli ayni sekilde
+- pull yaptiktan sonra imagelari lokale cekmis oluyoruz imagelari calistirmak icin container lari aciyoruz
+- $ docker run -d -p 80:3000 frontend image in ilk 3 hanesi ayni islemi backend icinde yapiyoruz ve container lar calismaya basliyor
