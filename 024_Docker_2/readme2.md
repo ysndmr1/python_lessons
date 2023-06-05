@@ -47,3 +47,27 @@ CMD python manage.py runserver 0.0.0.0:8000
 EXPOSE 8000
 
 # docker system prune -a -f hepsini siler
+
+- frontend icin docker file aciyoruz
+- nodejs icin surumunu giriyoruz
+- work dir icin frontend klasöru acmasini istiyoruz
+- copy icin lokaldeki ve docker daki olarak
+- run icin calistiracagimiz npm install yada yarn install yazabiliriz
+- cmd icin container imiz calisacagi zaman yapacagi islem icin npm start || yarn start (container yarn ile calismayabiliyoru bu yuzden npm kullanmak daha saglikli)
+- expose icinde 3000 port unu kullaniyoruz
+- terminali aciyoruz ayni islemleri frontend icin yaziyoruz
+- docker build ./frontend -t frontend_image ile image olusturuyoruz islemler bittikten sonra arka plan calismasi icin frontend de de yapiyoruz
+- docker run -d -p 3000:3000 deamon modda portlarimda 3000 ayarlari ile container i mi calistir demis oluyoruz
+- dcoker desktop da resource ayarlarindan bilgisayarimizdaki docker in kullanacagi ayarlari degistirebiliriz
+- bu islemden sonra frontend ve backend vscode kapali olsa bile calisabiliyor bilgisayarimiz bir nevi server görevi göruyor
+
+FROM node:19-slim
+
+WORKDIR /frontend
+
+COPY . .
+
+RUN npm install
+
+CMD npm start
+EXPOSE 3000
