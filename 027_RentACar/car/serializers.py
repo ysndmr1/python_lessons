@@ -33,6 +33,10 @@ class CarSerializer(FixSerializer):
             fields.pop("plate")
             fields.pop("availability")
 
+        # fields_to_delete = ['created', 'updated', 'plate','user','user_id']
+        # for field in fields_to_delete:
+        #     fields.pop(field)
+
         return fields
 
 
