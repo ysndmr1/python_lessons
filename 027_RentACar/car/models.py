@@ -55,4 +55,11 @@ class Reservation(FixModel):
     end_date = models.DateField()
 
     def __str__(self):
-        return f"{self.user} reserved {self.car} - {self.start_date} - {self.end_date}"
+        return f"[{self.user}] - {self.car} - {self.start_date} - {self.end_date}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "start_date", "end_date"], name="user_rent_date"
+            )
+        ]
