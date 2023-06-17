@@ -4,7 +4,7 @@ from .serializers import (
     Product, ProductSerializer,
     Firm, FirmSerializer,
     Purchase, PurchaseSerializer,
-    Sale, SaleSerializer,
+    Sale, SaleSerializer,CategoryProductsSerializer,
 )
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import DjangoModelPermissions
@@ -30,6 +30,13 @@ class CategoryView(FixView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     search_fields = ['name']
+
+     # Kategori içinde ürünler göster/gösterme: (url/?products=1)
+    def get_serializer_class(self):
+        if self.request.query_params.get("products", False):
+            return CategoryProductsSerializer
+        else:
+            return super().get_serializer_class()
 
 
 class BrandView(FixView):
