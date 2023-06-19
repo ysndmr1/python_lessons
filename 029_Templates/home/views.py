@@ -11,6 +11,10 @@ def home(request):
 def student(request):
     context= {
         'first_name':'Jacop',
-        'my_list': [2020,2021,2022],     
+        'my_list': [2020,2021,2022], 
+        'book_name': 'lord of the rings',    
               }
     return render(request, 'home/home.html',context )
+
+def student_detail(request):
+    return render(request, 'home/student_detail.html')

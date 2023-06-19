@@ -1,17 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student</title>
-  </head>
-  <body>
-    <h1>Student Page</h1>
-    {{first_name}}
+{% extends 'home/base.html' %} {% block body %} {% load static %}
 
-    <!-- mycomment -->
+<h1>Student Page</h1>
+{{first_name | title}}
+<br />
 
-    {% comment %} multiple line comment {% endcomment %} {# my comment for dtl#}
-    {% for year in my_list %} {{year}} {% endfor %}
-  </body>
-</html>
+{{book_name | truncatechars:5 }}
+<br />
+<!-- mycomment -->
+
+{% comment %} multiple line comment {% endcomment %} {# my comment for dtl#}
+<div style="color: red">
+  {% for year in my_list %}
+  <li>{{year}}</li>
+  {% endfor %}
+</div>
+
+<img style="width: 30%" src="{% static 'home/git.png' %}" alt="My image" />
+
+{% endblock body %}
