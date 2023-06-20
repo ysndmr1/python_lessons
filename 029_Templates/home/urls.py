@@ -3,7 +3,8 @@ from .views import (
     home,
     student,
     student_detail,
-    student_add
+    student_add,
+    StudentAddView,
     )
 
 
@@ -13,5 +14,6 @@ urlpatterns = [
     path('student/', student),
     path('detail/', student_detail,name='list'),
     path('add/', student_add,name='add'),
+    path('student-add/', StudentAddView.as_view(), name='student-add'),
 ]
 

@@ -1,7 +1,6 @@
 {% extends 'home/base.html' %} {% block title %} Student Add {% endblock title%}
 {% block body %}
 
-<h1>Student Add List</h1>
 <form action="" method="post">
   {% csrf_token %} {{form.as_p}}
   <input type="submit" value="Add" />
