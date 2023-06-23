@@ -32,3 +32,29 @@ def todo_add(request):
     }
     # return render(request, 'add.html', context)
     return render(request, 'add_update.html', context)
+
+
+# Update:
+def todo_update(request, pk):
+    todo = Todo.objects.get(id=pk)
+    form = TodoForm(instance=todo)
+    if request.method== "POST":
+        form = TodoForm(data=request.POST, instance=todo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Güncellendi.')
+            return redirect("todo_list")
+    context = {
+        'form': form,
+        'todo': todo
+    }
+    # return render(request, 'update.html', context)
+    return render(request, 'add_update.html', context)
+
+# Delete:
+def todo_delete(request, pk):
+    todo = Todo.objects.get(id=pk)
+    todo.delete()
+    messages.success(request, 'Silindi.')
+    # No need template.
+    return redirect("todo_list")

@@ -138,5 +138,57 @@ return render(request, 'list.html', {
 
 - ⁡⁢⁣⁢views da add icin bir fonk yaziyoruz return rende icinde request ve html dosyamizin adi olacak (add html yi olusturup icinde extend ve block container i yaziyoruz ve istediklerimizi de block larin arasina yazarak override edecegiz ) bir form yazacagiz bu form icine butun inputlari textboxlari tek tek yazmayacagiz djangonun burayi doldurmasini istiyoruz bunun icinde buraya form verisinin gelmesi gerekiyor orayi da views icndeki add fonk nuna yazacagiz ve context ekliyoruz fakat context icinde gönderecegmiz form datasini almamiz lazim onuda forms.py da yazdigimiz todoformdan alacagiz o da zaten icinde model tododan aliyordu bunu almak icin fonk altinda form degiskenine todoform u atiyoruz ve yukarida import etmistik bu form degiskenini de context icinde form keyi ile ver diyoruz (context gönderdigimiz icin renderda context i yazmamiz gerekiyor ) ve yeni yazdigimiz sayfanin url sini eklemeyi unutmuyoruz url sayfasinda views da yazdigimiz funk da cagiriyoruz ⁡⁢⁣⁣bu yeni sayfada ekledigimiz form elementinin todo list e eklenmesi icin bir de submit e ihtiyaci var o da add.html sayfasinda form un altina ekliyoruz ⁡⁡
 - yeni eklemenin todo ya eklenmesi icin submit yaptigimizda csrf token istiyor bunun sebebi bizim canli da kullandigimiz bir sitede veriler benzer tag ve title isimleri ile gönderilebilir bu token ile gelen verinin dogrulugu kontrol ediliyor bu yuzden add sayfasinda form altina csrf token ekliyoruz
+
 - gönderdigimiz veriyi almak icin views deki add de devam ediyoruz disardan post ile gelen veriyi (serializer gibi) form a dönusturmemiz lazim fonk altinda form a atadigimiz todoForm un icine request post ile veri gelebilir yada none gelebilir diyoruz if ile form verisi gelmis ise is_valid metodu calissin valid ise de save edilsin diyoruz ve veriyi kaydettigi zaman message versin diye django.contrib den message import ediyoruz ve eger kaydetme islemi basarili ise message.succes ile istedigimiz messagi veriyoruz ve altina eger ekleme islemi basarili ise bizi todo sayfasina götur demek icin redirect ile gönderecegimiz yeri yaziyoruz burada dikkat etmemiz gereken nokta her zaman ayni urlden gelmeyebilir bunun icin url sayfasinada kullanacagimiz urlnin sonuna name ile isim ekliyoruz ve burada da redirect ile oradaki name e gönderiyoruz url degisse bile name i kullandigimiz icin bir degisiklik olmayacak
-- ekledigimiz messag i nasil göruntuleyecegiz 1.55 den devam
+
+# Add:
+⁡⁢⁢⁢def todo_add(request):
+form = TodoForm(request.POST or None)
+if form.is_valid():
+form.save() # Message:
+messages.success(request, 'Kaydedildi.') # If OK redirect:
+return redirect('todo_list') # redirect('path_name')
+context = {
+"form": form
+} # return render(request, 'add.html', context)
+return render(request, 'add_update.html', context)⁡
+
+- ekledigimiz messag i nasil göruntuleyecegiz
+- djangoda message direk göruntuleme olarak gorunmuyor bir msg kutusu var oraya atiyor eger göruntule dersek onu göruntuleyip siliyor, msg i baska sayfada göruntuleyebilirz, ayni sekilde delete update islemleri icinde msg yayinlayacagiz bunlari eger base html e eklersek sistemin tumunde aktif olur
+- update icin
+- url deki pk yi fonk icinde req yaninda yakaliyoruz
+- degistirmek istedigimiz kaydin ilk halini pk ile al
+- ⁡⁢⁣⁢(serializer da data ve instance lar vardi data yeni kayit icin instance ise mevcut bir data icin) todo add deki requestpost data aslinda ilk parametre icinde data oldugu icin yazmamiza gerek olmuyor data sana verdigim veriler yeni veriler demek bunlari objeye cevir diyoruz instance ise verdigimiz veriler mevcut veriler yani objeye cevirilmis halleri bunlari da forma cevir diyoruz update isleminin ilk basmaginda kayitli veriyi aliyoruz onu todo degiskenine atiyoruz sonra form degiskeni olusturup instance bu todo yu atamis oluyoruz bu iki satir mevcut kaydi aldigimiz satir⁡
+- req post yapildimi eger yapildiysa mevcut veriyi yeni veri ile degistir
+- eger veriler dogru ise kaydet ve msg yayinla ve ana sayfaya dön diyoruz
+
+# Update:
+
+⁡⁢⁢⁢def todo_update(request, pk):
+todo = Todo.objects.get(id=pk)
+form = TodoForm(instance=todo)
+if request.method== "POST":
+form = TodoForm(data=request.POST, instance=todo)
+if form.is_valid():
+form.save()
+messages.success(request, 'Güncellendi.')
+return redirect("todo_list")
+context = {
+'form': form,
+'todo': todo
+} # return render(request, 'update.html', context)
+return render(request, 'add_update.html', context)⁡
+
+- html sayfasina geldigimizde ise add ve update ayni fakat bir farklari var add de baslik icinde add todo yazarken update de mevcut verinin basligi {{ }} icinde yaziyor baslik önemli degilse 2 sayfa da ayni sekilde kullanilabilir
+
+- delete islemi icin update gibi bir sablon kullanilabilir fakat gerek yok
+- silmek istedigimiz veriyi yine pk ile aliyoruz
+- get komutu ile id veriyi bir degiskene atiyoruz sonra o degiskeni siliyoruz ve msg yayinliyoruz ve todolist sayfamiza yönlendirecegiz
+
+# Delete:
+
+def todo_delete(request, pk):
+todo = Todo.objects.get(id=pk)
+todo.delete()
+messages.success(request, 'Silindi.') # No need template.
+return redirect("todo_list")
