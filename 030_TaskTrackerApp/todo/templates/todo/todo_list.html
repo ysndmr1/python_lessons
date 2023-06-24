@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block container %}
+<hr>
+<h2>Todo ListView</h2>
+<p><a href="/add" class="btn btn-primary">YENİ EKLE</a></p>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>priority</th>
+            <th>title</th>
+            <th>created_date</th>
+            <th>status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {# SingleLine Comment #}
+    {% comment %}
+        Multiline Comment
+    {% endcomment %}
+    {% for todo in object_list %}
+        <tr>
+            <td>
+                {% if todo.priority == 1 %}
+                <b class="text-danger">{{ todo.get_priority_display }}</b>
+                {% elif todo.priority == 2 %}
+                <b class="text-warning">{{ todo.get_priority_display }}</b>
+                {% else %}
+                <b class="text-info">{{ todo.get_priority_display }}</b>
+                {% endif %}
+            </td>
+            <td><a href="/detail/{{ todo.id }}">{{ todo.title }}</a></td>
+            <td>{{ todo.created_date }}</td>
+            <td>
+                {% if todo.status == "P" %}
+                <b class="text-danger">{{ todo.get_status_display }}</b>
+                {% else %}
+                <b class="text-success">{{ todo.get_status_display }}</b>
+                {% endif %}
+            </td>
+            <td>
+                <a href="/update/{{ todo.id }}">Güncelle</a>
+                <a href="/delete/{{ todo.id }}" onclick="return confirm('Are you sure?')">Sil</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock container %}

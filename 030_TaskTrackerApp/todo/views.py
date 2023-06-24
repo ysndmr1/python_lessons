@@ -58,3 +58,67 @@ def todo_delete(request, pk):
     messages.success(request, 'Silindi.')
     # No need template.
     return redirect("todo_list")
+
+
+# ------------------------------------
+# Class Based Views
+# ------------------------------------
+from django.urls import reverse_lazy
+
+from django.views.generic import (
+    ListView,
+    CreateView,
+    DetailView,
+    UpdateView,
+    DeleteView,
+)
+
+class TodoListView(ListView):
+    model = Todo
+    ordering = ['-id']
+    # template_name = 'todo_list.html' # after 'templates/' default: 'modelname/modelname_list.html'
+
+
+
+class TodoDetailView(DetailView):
+    model = Todo
+    # template_name = 'todo_detail.html' # after 'templates/' default: 'modelname/modelname_detail.html'
+
+
+class TodoCreateView(CreateView):
+    model = Todo
+    form_class = TodoForm
+    success_url = reverse_lazy('todo_list')
+    # template_name = 'todo_form.html' # after 'templates/' default: 'modelname/modelname_form.html'
+
+    def post(self, request, *args, **kwargs):
+        messages.success(request, 'Kaydedildi.')
+        return super().post(request, *args, **kwargs)
+
+
+class TodoUpdateView(UpdateView):
+    model = Todo
+    form_class = TodoForm
+    success_url = reverse_lazy('todo_list')
+    # template_name = 'todo_form.html' # after 'templates/' default: 'modelname/modelname_form.html'
+
+    def post(self, request, *args, **kwargs):
+        messages.success(request, 'Güncellendi.')
+        return super().post(request, *args, **kwargs)
+
+
+class TodoDeleteView(DeleteView):
+    model = Todo
+    # form_class = TodoForm
+    success_url = reverse_lazy('todo_list')
+    # template_name = 'todo_confirm_delete.html' # after 'templates/' default: 'modelname/modelname_confirm_delete.html'
+
+    # template dosyasına git, onay al, öyle sil:
+    # def post(self, request, *args, **kwargs):
+    #     messages.success(request, 'Silindi.')
+    #     return super().post(request, *args, **kwargs)
+    
+    # template dosyasına gitmeden direkt sil:
+    def get(self, request, *args, **kwargs):
+        messages.success(request, 'Silindi.')
+        return super().delete(request, *args, **kwargs)

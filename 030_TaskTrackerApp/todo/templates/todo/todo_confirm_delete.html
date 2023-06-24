@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block container %}
+
+<hr>
+<h2>TodoDeleteView</h2>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Delete" />
+</form>
+
+{% endblock container %}

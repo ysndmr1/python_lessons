@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block container %}
+
+<hr>
+<h2>TodoCreateView | TodoUpdateView</h2>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <table>{{ form }}</table>
+    <input type="submit" value="Submit" />
+</form>
+
+{% endblock container %}

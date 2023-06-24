@@ -192,3 +192,44 @@ todo = Todo.objects.get(id=pk)
 todo.delete()
 messages.success(request, 'Silindi.') # No need template.
 return redirect("todo_list")
+
+------- ⁡⁢⁣⁢views icin class based⁡ -------------
+
+- django icinde yerlesik bir takim class lar var listeleme create vs icin model viewset gibi tek bir class yok bunun icin ayri ayri class viewlari tanimlamamiz gerekiyor
+- todo list icin listview a inherit edip kullanacagiz
+- listview e baktigimizda icinde mixin ve baselist view oldugunu göruyoruz base view da get metodu ile listeleme ve gösterme islemleri yapiyor bunlari degistirmek icin bu get metodunu override etmemiz gerekiyor
+- urls sayfasinda yazdigimiz view i import edip kullanacagiz class view da dikkat etmemiz gereken template icinde model icinde (todo) klasörunu de bekliyor o yuzden model adina olusturacagimz temp icin klasör olusturuyoruz
+- fon yazaraken veriyi atayacagimiz ismi biz seciyoruz todos olarak ve verileri sayfada göstermek icin html icinde for döngusune alirken bu todos ismi ile cagiriyoruz fkat view kullandigimizda böyle bir atama yapmadigimiz icin (arka planda view bu islemi yapiyor cunku ) verinin gelen ismini kullanmamiz lazim html sayfasinda ve bu isim de object_list for döngusunde kullanirken object_list ile kullanacagiz
+- ayni sekilde detail,create,update ve delete view larini da yaziyoruz
+- template name altinda isim degistirmek istersek yeni isim verebiliriz burada default olani kullanmak istedigimz icin yoruma aliyoruz ayrica yeni isim versek de okuma sekli olarak temp altinda model\_ seklinde olmasi gerekiyor
+- view a ekledigimiz class lar icin urls de tanimlamalarini da yaziyoruz
+- ekledigimiz url ler icin html dosyalarini da olusturuyoruz
+- list icin object_list kullanmistik detail icin ise de if de kullanacagimiz yerde model ismini kucuk harflerle yazarak yapiyoruz
+- detail baglanti seklinde göstermek icin html sayfasinda if den sonra gerekli yerine a tag i icinde detail/ {{}} icinde model id sini veriyoruz
+- create islemi icin kullancagimiz temp name \_form seklinde bize todo_form olarak html aciyoruz ve url ye de ekliyoruz
+- listeleme ve detail icin bir göruntuleme yaptik fakat create isleminde bir de form olacak create vies icin kullanacgimiz form_class = todoForm seklinde create view a ekliyoruz, views lara özel yönlendirme yapmak icin revesed_lazy fonk kullaniyoruz redirect yerine reversed icine kullanacagimiz tag ise succes_url
+- fonk yazarken msg yayinlamistik class based icin post metodunu override edip msg yayinliyoruz
+- update islemi icin de post kullanildigi icin onu da override etmek icin post fonk aliyoruz ve istedigimiz msg ekliyoruz
+- views de yaptigimiz islemler icin url lerini de yaziyoruz
+- todolari siralamak icin list view icinde get ordering var onu list view e id leri en son ekledigimiz basa gelmesi icin -id olarak ekliyoruz
+- delete islemi icin bizden delete html olmasini istiyoruz html i ekliyoruz ve yine post fonk override ederek msg ekliyoruz
+
+# ------------------------------------
+
+# Class Based Views
+
+# ------------------------------------
+
+from django.urls import reverse_lazy
+
+from django.views.generic import (
+ListView,
+CreateView,
+DetailView,
+UpdateView,
+DeleteView,
+)
+
+class TodoListView(ListView):
+model = Todo
+ordering = ['-id'] # template_name = 'todo_list.html' # after 'templates/' default: 'modelname/modelname_list.html'
