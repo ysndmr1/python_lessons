@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block container %}
+<style>
+    div#id_size { display: flex; }
+</style>
+
+<div class="mx-auto d-flex justify-content-center align-items-center pt-5">
+    <div class="card">
+        {% if pizza %}
+        <div class="card-body">
+            <h5 class="card-title">{{ pizza.name }}</h5>
+            <p class="card-text">
+            <ul>
+                <li>
+                    Toppings: {{ pizza.toppings.all | join:',' }}
+                </li>
+                <li>
+                    Price: <strong> {{ pizza.price }} $</strong>
+                </li>
+                <li>
+                    Quantitiy: <strong> {{ order.quantity }}</strong>
+                </li>
+            </ul>
+            </p>
+        </div>
+        {% endif %}
+        <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <table>{{ form }}</table>
+                <br>
+                <input class="btn btn-primary" type="submit" value="OK">
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock container %}

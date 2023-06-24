@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block container %}
+
+<div class="mx-auto d-flex justify-content-center align-items-center pt-5">
+    <div class="card">
+        {% if order.pizza.image %}
+        <img src="{{ order.pizza.image.url }}" class="card-img-top">
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ order.pizza.name }}</h5>
+            <p class="card-text">
+            <ul>
+                <li>
+                    Toppings: {{ order.pizza.toppings.all | join:',' }}
+                </li>
+                <li>
+                    Price: <strong> {{ order.pizza.price }} $</strong>
+                </li>
+                <li>
+                    Quantitiy: <strong> {{ order.quantity }}</strong>
+                </li>
+            </ul>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock container %}

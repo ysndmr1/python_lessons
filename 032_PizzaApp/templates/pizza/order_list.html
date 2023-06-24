@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block container %}
+
+<div class="d-flex flex-column justify-content-center mx-auto pt-5 col-9">
+    <div class="alert alert-warning text-center p-1"> <h1>{{ user.username | upper }}'s Orders</h1></div>
+    {% for order in orders  %}
+    <div class="card m-2 shadow p-2" >
+        <div class="row g-0 d-flex justify-content-between">
+            <div class="col-md-1 d-flex align-items-center">
+                {% if order.pizza.image %}
+                <img src="{{ order.pizza.image.url }}"  style=" border-radius: 50%; width: 60px; height: 60px" >
+                {% endif %}
+            </div> 
+            <div class="col-md-5 d-flex justify-content-start flex-fill">
+                <div class="card-body">
+                    <p class="card-title"><strong>Pizza:</strong> {{ order.pizza }} 🍕  <strong>Size:</strong> {{ order.size }} 🍕 <strong>X :</strong> {{ order.quantity }} </p>              
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center rounded">
+                <a href="{% url 'order_detail' order.id %}"> <button class=" btn btn-info me-2">Detail</button></a>
+            <a href="{% url 'order_update' order.id %}"> <button class=" btn btn-warning me-2">Update</button></a>
+             <a href="{% url 'order_delete' order.id %}"><button class=" btn btn-danger me-2" onclick="return confirm('Are you sure?')">Delete</button></a>
+          </div> 
+        </div>
+      </div>
+      {% endfor %}
+</div>
+
+{% endblock container %}
