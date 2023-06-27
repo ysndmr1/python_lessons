@@ -185,13 +185,13 @@ return render(request, 'add_update.html', context)⁡
 - silmek istedigimiz veriyi yine pk ile aliyoruz
 - get komutu ile id veriyi bir degiskene atiyoruz sonra o degiskeni siliyoruz ve msg yayinliyoruz ve todolist sayfamiza yönlendirecegiz
 
-# Delete:
+⁡⁢⁢⁢# Delete:
 
 def todo_delete(request, pk):
 todo = Todo.objects.get(id=pk)
 todo.delete()
 messages.success(request, 'Silindi.') # No need template.
-return redirect("todo_list")
+return redirect("todo_list")⁡
 
 ------- ⁡⁢⁣⁢views icin class based⁡ -------------
 
