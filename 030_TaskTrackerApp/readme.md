@@ -220,7 +220,7 @@ return redirect("todo_list")⁡
 
 # ------------------------------------
 
-from django.urls import reverse_lazy
+⁡⁢⁢⁢from django.urls import reverse_lazy
 
 from django.views.generic import (
 ListView,
@@ -233,3 +233,4 @@ DeleteView,
 class TodoListView(ListView):
 model = Todo
 ordering = ['-id'] # template_name = 'todo_list.html' # after 'templates/' default: 'modelname/modelname_list.html'
+⁡
