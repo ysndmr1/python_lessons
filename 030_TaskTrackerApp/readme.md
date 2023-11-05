@@ -233,4 +233,4 @@ DeleteView,
 class TodoListView(ListView):
 model = Todo
 ordering = ['-id'] # template_name = 'todo_list.html' # after 'templates/' default: 'modelname/modelname_list.html'
-⁡-----------------------------------------------------------------------------
+⁡------------------------------------------------------------------------------
